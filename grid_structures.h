@@ -33,6 +33,8 @@ namespace database
     explicit DataStructure(const char* fftype);
 
 
+    double coulomb(double q0, double q1, double r);
+
     std::map<const char*, DataStructureParam> m_params;
     std::vector<std::string> m_symface;
     int m_n1;
@@ -52,7 +54,7 @@ namespace database
   private:
     void set_param(const char* fftype);
     void set_symmetry();
-    void set_num_of_atoms();
+    virtual void set_num_of_atoms();
     void set_R();
     void set_phi();
     void set_theta();
@@ -63,7 +65,6 @@ namespace database
     double lj_9_6(double r, double eps, double sig);
     double lj_b_14_7(double r, double eps, double sig);
     double nocorr(double r, double eps, double sig);
-    double coulomb(double q0, double q1, double r);
   };
 
 
@@ -72,6 +73,7 @@ namespace database
   public:
     explicit WaterStructure(const char* fftype);
 
+    //virtual void set_num_of_atoms();
     static const std::map<int, std::vector<int> > grid_data;
   private:
   };

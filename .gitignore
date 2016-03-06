@@ -9,6 +9,10 @@ depcomp/
 Makefile.in
 qm
 
+.cproject
+.project
+*.gz
+
 # exvim
 src.exvim
 .exvim.src/

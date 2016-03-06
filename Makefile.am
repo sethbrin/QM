@@ -7,6 +7,8 @@ qm_SOURCES= test.cpp \
             grid_structures.cpp \
 					  read_energy_force_new.h \
 						read_energy_force_new.cpp \
+						common.h \
+						common.cpp \
 						gzstream/gzstream.h \
 						#trans_rot_coords.h
 
