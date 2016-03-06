@@ -7,7 +7,7 @@
 #define TRANS_ROT_COORDS_H_
 
 #include <vector>
-#include <assert>
+#include <cassert>
 
 namespace math
 {

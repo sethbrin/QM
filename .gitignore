@@ -1,3 +1,18 @@
+# Automake tmp files
+autom4te.cache/
+*.log
+configure
+Makefile
+config.status
+depcomp/
+.deps/
+Makefile.in
+qm
+
+# exvim
+src.exvim
+.exvim.src/
+
 # Compiled Object files
 *.slo
 *.lo
