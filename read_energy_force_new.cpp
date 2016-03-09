@@ -54,7 +54,7 @@ EnergeForceDatabase::EnergeForceDatabase(const char* filename, const char* fragt
   {
     m_all_config[i] = NULL;
   }
-  for (size_t i=0; i<m_pDS->m_nConf * m_pDS->m_nNorm; i++)
+  for (int i=0; i<m_pDS->m_nConf * m_pDS->m_nNorm; i++)
   {
     m_wtr_config[i] = NULL;
   }
@@ -65,7 +65,7 @@ EnergeForceDatabase::EnergeForceDatabase(const char* filename, const char* fragt
 
 EnergeForceDatabase::~EnergeForceDatabase()
 {
-  for (int i=0; i<m_pDS->m_R_NDX.size() * m_pDS->m_nGrid * m_pDS->m_nConf * m_pDS->m_nNorm; i++)
+  for (size_t i=0; i<m_pDS->m_R_NDX.size() * m_pDS->m_nGrid * m_pDS->m_nConf * m_pDS->m_nNorm; i++)
   {
     delete m_all_config[i];
   }

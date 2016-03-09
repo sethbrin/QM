@@ -32,6 +32,7 @@ namespace database
   public:
     explicit DataStructure(const char* fftype);
 
+    void initialize();
 
     double coulomb(double q0, double q1, double r);
 
@@ -50,28 +51,42 @@ namespace database
     bool m_IsHmm;
     std::vector<int> m_Hmm;
     Fun_lj m_lj;
+    const char* m_fftype;
 
-  private:
-    void set_param(const char* fftype);
-    void set_symmetry();
+    virtual void set_param(const char* fftype);
+    virtual void set_symmetry();
     virtual void set_num_of_atoms();
-    void set_R();
-    void set_phi();
-    void set_theta();
-    void set_nConf();
-    void degree2radius();
-    void set_H_correction(bool flag);
+    virtual void set_R();
+    virtual void set_phi();
+    virtual void set_theta();
+    virtual void set_nConf();
+    virtual void degree2radius();
+    virtual void set_H_correction(bool flag);
     double lj_12_6(double r, double eps, double sig);
     double lj_9_6(double r, double eps, double sig);
     double lj_b_14_7(double r, double eps, double sig);
     double nocorr(double r, double eps, double sig);
+  private:
   };
 
-
-  class WaterStructure : public DataStructure
+  class PrpStructure: public DataStructure
   {
   public:
-    explicit WaterStructure(const char* fftype);
+    explicit PrpStructure(const char* fftype):DataStructure(fftype){}
+    void set_param(const char* fftype);
+    void set_theta();
+    void set_symmetry();
+    void set_num_of_atoms();
+    void set_H_correction(bool flag);
+  };
+
+  class WaterStructure : public PrpStructure
+  {
+  public:
+    explicit WaterStructure(const char* fftype):PrpStructure(fftype){}
+    void set_num_of_atoms();
+    void set_theta();
+    void set_H_correction(bool flag);
 
     //virtual void set_num_of_atoms();
     static const std::map<int, std::vector<int> > grid_data;

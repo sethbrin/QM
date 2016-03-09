@@ -1,7 +1,12 @@
+#include <cstring>
+
 #include "grid_structures.h"
 
 using namespace database;
 
+/**
+ * DataStructure
+ */
 void DataStructure::set_param(const char* fftype)
 {
   // set params
@@ -21,7 +26,7 @@ void DataStructure::set_param(const char* fftype)
 
   params_tmp.dim1 = 0;
 
-  if (fftype == "none")
+  if (strcmp(fftype, "none") == 0)
   {
     m_params.insert(std::make_pair("qCT", params_tmp));
     m_params.insert(std::make_pair("qHC", params_tmp));
@@ -132,14 +137,14 @@ double DataStructure::coulomb(double q0, double q1, double r)
   return q0 * q1 / r * 332.5;
 }
 
-double DataStructure::nocorr(double r, double eps, double sig)
+double DataStructure::nocorr(double , double , double)
 {
   return 0.0;
 }
 
-DataStructure::DataStructure(const char* fftype="14-7")
+void DataStructure::initialize()
 {
-  set_param(fftype);
+  set_param(m_fftype);
   set_symmetry();
   set_R();
   set_phi();
@@ -156,8 +161,118 @@ DataStructure::DataStructure(const char* fftype="14-7")
     {"14-7", &DataStructure::lj_b_14_7}
   };
 
-  m_lj = tmp[fftype];
+  m_lj = tmp[m_fftype];
+
 }
+
+
+
+DataStructure::DataStructure(const char* fftype="14-7"): m_fftype(fftype)
+{
+}
+
+
+/**
+ * PrpStructure
+ */
+void PrpStructure::set_param(const char* fftype)
+{
+  // set params
+  DataStructureParam params_tmp;
+  params_tmp.dim2[0] = 0;
+  params_tmp.dim2[1] = 3.8210;
+  m_params.insert(std::make_pair("CT-OW", params_tmp));
+
+  params_tmp.dim2[1] = 2.2993;
+  m_params.insert(std::make_pair("CT-HW", params_tmp));
+
+  params_tmp.dim2[0] = 0.0100;
+  params_tmp.dim2[1] = 2.5279;
+  m_params.insert(std::make_pair("HC-OW", params_tmp));
+
+  params_tmp.dim2[1] = 2.2165;
+  m_params.insert(std::make_pair("HC-HW", params_tmp));
+
+  params_tmp.dim1 = 0;
+
+  if (strcmp(fftype,"none") == 0)
+  {
+    m_params.insert(std::make_pair("qCT", params_tmp));
+    m_params.insert(std::make_pair("qHC", params_tmp));
+    m_params.insert(std::make_pair("qOw", params_tmp));
+    m_params.insert(std::make_pair("qHW", params_tmp));
+  }
+  else
+  {
+    m_params.insert(std::make_pair("qCT", params_tmp));
+    m_params.insert(std::make_pair("qHC", params_tmp));
+    params_tmp.dim1 = -0.6800;
+    m_params.insert(std::make_pair("qOw", params_tmp));
+    params_tmp.dim1 = 0.3400;
+    m_params.insert(std::make_pair("qHW", params_tmp));
+  }
+
+}
+
+void PrpStructure::set_theta()
+{
+  m_THETA_angles = {
+    {0, {0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0}},
+    {1, {0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0}},
+    {2, {0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0}},
+    {3, {0.0, 20.0, 40.0, 60.0, 80.0, 100.0, 120.0, 140.0, 160.0, 180.0}},
+    {4, {0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0}},
+    {5, {0.0, 60.0, 120.0, 180.0}},
+    {6, {0.0}}
+  };
+}
+
+void PrpStructure::set_symmetry()
+{
+  m_symface = {"xy", "xz"};
+}
+
+void PrpStructure::set_num_of_atoms()
+{
+  m_n1 = 11;
+  m_n2 = 3;
+}
+
+void PrpStructure::set_H_correction(bool flag)
+{
+  m_IsHmm = false;
+  m_Hmm = {1,2,3,8,9,10};
+}
+
+/**
+ * WaterStructure
+ */
+void WaterStructure::set_num_of_atoms()
+{
+  m_n1 = 3;
+  m_n2 = 3;
+}
+
+void WaterStructure::set_H_correction(bool flag)
+{
+  m_IsHmm = false;
+  m_Hmm = {1,2,3,8,9,10};
+}
+
+void WaterStructure::set_theta()
+{
+  m_THETA_angles = {
+    {0, {0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0}},
+    {1, {0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0}},
+    {2, {0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0}},
+    {3, {0.0, 20.0, 40.0, 60.0, 80.0, 100.0, 120.0, 140.0, 160.0, 180.0}},
+    {4, {0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0}},
+    {5, {0.0, 45.0, 90.0, 135.0, 180.0}},
+    {6, {0.0}}
+  };
+}
+
+
 
 const std::map<int, std::vector<int> >
   WaterStructure::grid_data = {
@@ -217,20 +332,18 @@ const std::map<int, std::vector<int> >
         {58, {58, 59, 61, 61}} ,
         {59, {59, 60, 61, 61}}};
 
-WaterStructure::WaterStructure(const char* fftype="14-7")
-  :DataStructure(fftype)
-{
-}
-
 DataStructure* database::getDataStructure(const char* fragtype)
 {
-  if (fragtype == "wtr")
+  DataStructure* pDS = NULL;
+  if (strcmp(fragtype,"wtr") == 0)
   {
-    return new WaterStructure(fragtype);
+    pDS = new WaterStructure(fragtype);
   } else
   {
-    return new DataStructure(fragtype);
+    pDS = new DataStructure(fragtype);
   }
+  pDS->initialize();
+  return pDS;
 }
 
 

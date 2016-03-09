@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign
-AM_CXXFLAGS = -fpic -Wall -Wextra -std=c++11
+AM_CXXFLAGS = -fpic -Wall -Wextra -Wno-unused-parameter -std=c++11
 
 bin_PROGRAMS=qm
 qm_SOURCES= test.cpp \
