@@ -125,8 +125,6 @@ void EnergeForceDatabase::set_all(int dim1, int dim2, int dim3, int dim4, Config
   assert(dim4 < size4);
 
   m_all_config[dim1 * size2 * size3 * size4 + dim2 * size3 * size4 + dim3 * size4 + dim4] = cfg;
-
-
 }
 
 
