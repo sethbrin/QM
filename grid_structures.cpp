@@ -1,6 +1,7 @@
 #include <cstring>
 
 #include "grid_structures.h"
+#include "common.h"
 
 using namespace database;
 
@@ -171,6 +172,37 @@ DataStructure::DataStructure(const char* fftype="14-7"): m_fftype(fftype)
 {
 }
 
+std::pair<std::vector<double>, std::vector<double> > DataStructure::calt_vec1(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+{
+  assert(a0.size() == a1.size());
+  assert(a0.size() == a2.size());
+  return std::pair<std::vector<double>, std::vector<double> >(a0, {1, 0, 0});
+}
+
+std::pair<std::vector<double>, std::vector<double> > DataStructure::calt_vec2(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+{
+  assert(a0.size() == a1.size());
+  assert(a0.size() == a2.size());
+  return std::pair<std::vector<double>, std::vector<double> >(a1, {0, 1, 0});
+}
+
+std::vector<double> DataStructure::calt_dvec(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+{
+  assert(a0.size() == a1.size());
+  assert(a0.size() == a2.size());
+  double ratio_CA1 = 0.5618541311379575;
+  double ratio_CA2 = 0.4381458688620425;
+
+  int size = a0.size();
+  std::vector<double> res(0, size);
+
+  for (int i=0; i<size; i++)
+  {
+    res[i] = a0[i] * ratio_CA1 - a1[i] * ratio_CA2;
+  }
+  return res;
+}
+
 
 /**
  * PrpStructure
@@ -244,6 +276,44 @@ void PrpStructure::set_H_correction(bool flag)
   m_Hmm = {1,2,3,8,9,10};
 }
 
+std::pair<std::vector<double>, std::vector<double> > PrpStructure::calt_vec1(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+{
+  assert(a0.size() == a1.size());
+  assert(a0.size() == a2.size());
+  return std::pair<std::vector<double>, std::vector<double> >(a1, {1, 0, 0});
+}
+
+std::pair<std::vector<double>, std::vector<double> > PrpStructure::calt_vec2(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+{
+  assert(a0.size() == a1.size());
+  assert(a0.size() == a2.size());
+
+  int size = a0.size();
+
+  for (int i=0; i<size; i++)
+  {
+    a0[i] -= a1[i];
+    a2[i] -= a1[i];
+  }
+
+  return std::pair<std::vector<double>, std::vector<double> >(get_normal(a0, a2), {0,0,1});
+}
+
+std::vector<double> PrpStructure::calt_dvec(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+{
+  assert(a0.size() == a1.size());
+  assert(a0.size() == a2.size());
+  int size = a0.size();
+  std::vector<double> res(0, size);
+
+  for (int i=0; i<size; i++)
+  {
+    res[i] = -0.5*(0.5*(a0[i] + a2[i]) + a1[i]);
+  }
+  return res;
+}
+
+
 /**
  * WaterStructure
  */
@@ -271,6 +341,42 @@ void WaterStructure::set_theta()
     {6, {0.0}}
   };
 }
+
+std::pair<std::vector<double>, std::vector<double> > WaterStructure::calt_vec1(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+{
+  assert(a0.size() == a1.size());
+  assert(a0.size() == a2.size());
+  int size = a0.size();
+  for (int i=0; i<size; i++)
+  {
+    a0[i] = (a1[i] + a2[i]) * 0.5;
+  }
+  return std::pair<std::vector<double>, std::vector<double> >(a0, {1, 0, 0});
+}
+
+std::pair<std::vector<double>, std::vector<double> > WaterStructure::calt_vec2(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+{
+  assert(a0.size() == a1.size());
+  assert(a0.size() == a2.size());
+
+  return std::pair<std::vector<double>, std::vector<double> >(get_normal(a2, a1), {0,0,1});
+}
+
+std::vector<double> WaterStructure::calt_dvec(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+{
+  assert(a0.size() == a1.size());
+  assert(a0.size() == a2.size());
+  int size = a0.size();
+  std::vector<double> res(0, size);
+
+  for (int i=0; i<size; i++)
+  {
+    res[i] = -a0[i];
+  }
+  return res;
+}
+
+
 
 
 
@@ -332,17 +438,23 @@ const std::map<int, std::vector<int> >
         {58, {58, 59, 61, 61}} ,
         {59, {59, 60, 61, 61}}};
 
+// TODO this is an ugly design, later we should change it
+// As if we set the fragtype first time, we can not change it
+// it will last for the program end
 DataStructure* database::getDataStructure(const char* fragtype)
 {
-  DataStructure* pDS = NULL;
-  if (strcmp(fragtype,"wtr") == 0)
+  static DataStructure* pDS = NULL;
+  if (pDS == NULL)
   {
-    pDS = new WaterStructure(fragtype);
-  } else
-  {
-    pDS = new DataStructure(fragtype);
+    if (strcmp(fragtype,"wtr") == 0)
+    {
+      pDS = new WaterStructure(fragtype);
+    } else
+    {
+      pDS = new DataStructure(fragtype);
+    }
+    pDS->initialize();
   }
-  pDS->initialize();
   return pDS;
 }
 

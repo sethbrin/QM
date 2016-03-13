@@ -7,8 +7,6 @@
 
 int main()
 {
-//  database::WaterStructure ws("saml");
-
   database::EnergeForceDatabase energe("./Dimer_deltaE_data_mp2_wtr_wtr.txt.gz", "wtr");
 
   energe.read_file();

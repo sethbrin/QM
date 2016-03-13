@@ -5,7 +5,7 @@
 
 using namespace database;
 
-Atom::Atom(std::string line)
+Atom::Atom(std::string& line)
 {
   std::vector<std::string> fields;
   boost::trim(line);
@@ -18,7 +18,7 @@ Atom::Atom(std::string line)
                          boost::lexical_cast<double>(fields[4]));
 }
 
-void Molecule::addAtom(std::string line)
+void Molecule::addAtom(std::string& line)
 {
   m_atoms.push_back(Atom(line));
 }

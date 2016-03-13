@@ -17,31 +17,10 @@
 
 namespace database
 {
-  class Coord
-  {
-  public:
-    explicit Coord():
-      m_x(0), m_y(0), m_z(0)
-    {}
-    explicit Coord(double x, double y, double z):
-      m_x(x), m_y(y), m_z(z)
-    {}
-    double m_x;
-    double m_y;
-    double m_z;
-
-    static double distance(Coord a, Coord b)
-    {
-      return (a.m_x-b.m_x)*(a.m_x - b.m_x)
-           + (a.m_x-b.m_x)*(a.m_x - b.m_x)
-           + (a.m_x-b.m_x)*(a.m_x - b.m_x);
-    }
-  };
-
   class Atom
   {
   public:
-    explicit Atom(std::string line);
+    explicit Atom(std::string& line);
 
     std::string m_name;
     Coord m_coord;
@@ -68,7 +47,7 @@ namespace database
   {
   public:
     explicit Molecule(){}
-    void addAtom(std::string line);
+    void addAtom(std::string& line);
 
     std::vector<Atom> m_atoms;
     double m_energy; //energe
