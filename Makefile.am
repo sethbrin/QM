@@ -8,6 +8,7 @@ qm_SOURCES= main.cpp \
 						common.cpp \
 						qm_interpolation.cpp \
 						gzstream/gzstream.h \
+						likely/TriCubicInterpolator.h\
 						#trans_rot_coords.h
 
 qm_LDADD = -lz -L./gzstream -lgzstream

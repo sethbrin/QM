@@ -23,7 +23,7 @@ namespace database
     explicit Atom(std::string& line);
 
     std::string m_name;
-    Coord m_coord;
+    std::vector<double> m_coord;
   };
 
 
@@ -33,6 +33,7 @@ namespace database
     explicit Config();
     explicit Config(int n1, int n2);
 
+    double get_prop(std::string name, double w);
     void setEnergy(double energe);
     void setName(std::string name);
     int m_n1;
@@ -40,6 +41,7 @@ namespace database
     int m_energy;
     std::string m_name;
     std::vector<Atom> m_fmole1;
+    std::vector<Atom> m_fmole2;
     std::vector<Atom> m_xmole2;
   };
 
@@ -68,6 +70,8 @@ namespace database
     void set_all(int dim1, int dim2, int dim3, int dim4, Config* cfg);
     void read_file();
 
+    double get_prop(int i, int j, int si, int ni, std::string name, double w, double eheigh);
+
   private:
 
     // read_mole from the first two line
@@ -87,6 +91,16 @@ namespace database
     Molecule m_mole2;
 
   };
+
+  /**
+   * Return the weights of the two configurations at one bisector direction.
+   *   Linear interpolation is used.
+   *   NOTE: The two vectors of the two configurations are calculated here
+   *       but in future, they should be retrieve from a pre-calculated 
+   *       constant data list or dictionary of fixed directions.
+   */
+  std::pair<double, double> weights_for_2_configs(const vector<double>& vec, const vector<database::Atom> config1, const vector<database::Atom> config2, double cut=0.0000001);
+
 }
 
 #endif

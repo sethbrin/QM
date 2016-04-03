@@ -8,6 +8,7 @@ depcomp/
 .deps/
 Makefile.in
 qm
+random/
 
 .cproject
 .project

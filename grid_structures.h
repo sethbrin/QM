@@ -36,6 +36,9 @@ namespace database
 
     double coulomb(double q0, double q1, double r);
 
+    void set_grid_data(const char* structure_type);
+
+    std::map<int, std::vector<int> > m_grid_data;
     std::map<const char*, DataStructureParam> m_params;
     std::vector<std::string> m_symface;
     int m_n1;
@@ -102,7 +105,6 @@ namespace database
     std::vector<double> calt_dvec(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
 
     //virtual void set_num_of_atoms();
-    static const std::map<int, std::vector<int> > grid_data;
   private:
   };
 

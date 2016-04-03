@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "grid_structures.h"
+#include "read_energy_force_new.h"
 
 namespace QM
 {
@@ -22,6 +23,9 @@ namespace QM
   {
   public:
     std::vector<double> m_x;
+    std::array<double, 3> m_f;
+
+    Atom(): m_f({0,0,0}) {}
     virtual ~Atom(){}
 
     virtual Atom* copy() { return NULL;}
@@ -75,6 +79,20 @@ namespace QM
 
     void ReorientToOrigin(double cut);
 
+    void MirrorAll();
+
+    void indexing();
+    void calt_conf_energy(database::EnergeForceDatabase& allconfig, bool isForce, double ehigh);
+
+    double get_interp_energy();
+
+    int m_ir;
+    int m_ig;
+    std::vector<double> m_vbis;
+    std::vector<double> m_vnrm;
+    std::vector<double>  m_rel_x;
+
+    std::map<std::string, double> m_properties;
     int m_n1;
     int m_n2;
     std::string m_fragtype;
@@ -94,17 +112,21 @@ namespace QM
 
   private:
     void spherical_x();
+
+    // get index of a struct
+    int get_index(double r, const vector<double>& vec);
   };
 
   class QMInterpolation
   {
   public:
-    explicit QMInterpolation(std::string fftype);
+    explicit QMInterpolation(std::string fftype, database::EnergeForceDatabase& allconfig);
 
-    void process(std::string filename);
+    std::string process(std::string filename);
 
   private:
     std::string m_fftype;
+    database::EnergeForceDatabase& m_allconfig;
 
     const static std::vector<std::vector<int> > m_aa_ndx;
     const static std::vector<int> m_c_ndx;

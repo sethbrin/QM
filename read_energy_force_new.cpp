@@ -13,9 +13,9 @@ Atom::Atom(std::string& line)
 
   assert(fields.size() == 5);
   m_name = fields[0];
-  m_coord = Coord(boost::lexical_cast<double>(fields[2]),
+  m_coord = {boost::lexical_cast<double>(fields[2]),
                          boost::lexical_cast<double>(fields[3]),
-                         boost::lexical_cast<double>(fields[4]));
+                         boost::lexical_cast<double>(fields[4])};
 }
 
 void Molecule::addAtom(std::string& line)
@@ -42,6 +42,29 @@ void Config::setName(std::string name)
   m_name = name;
 }
 
+static std::map<int, int> SwapH = {{0,0}, {1,1}, {2,2}, {3,3}, {4,5}, {5,4}};
+double Config::get_prop(std::string name, double w)
+{
+  if (name == "E") return m_energy;
+
+  // TODO Here will not reach Now
+  //int i = boost::lexical_cast<int>(name.substr(1, 3));
+  //int j = boost::lexical_cast<int>(name.substr(4, 3));
+
+  //if (w < 0)
+  //{
+  //  i = SwapH[i];
+  //}
+  //if (i < m_n1)
+  //{
+  //  return m_f
+  //}
+}
+
+/**
+ * EnergeForceDatabase
+ *
+ */
 EnergeForceDatabase::EnergeForceDatabase(const char* filename, const char* fragtype):
   m_filename(filename), m_fragtype(fragtype)
 {
@@ -91,6 +114,23 @@ Config*& EnergeForceDatabase::at_all(int dim1, int dim2, int dim3, int dim4)
   assert(dim4 < size4);
 
   return m_all_config[dim1 * size2 * size3 * size4 + dim2 * size3 * size4 + dim3 * size4 + dim4];
+}
+
+
+double EnergeForceDatabase::get_prop(int i, int j, int si, int ni, std::string name, double w, double eheigh=100.0)
+{
+  if (i < 0) return eheigh;
+  else if (i > m_pDS->m_R_NDX.size() - 1) return 0.0;
+
+  Config*& cfg = at_all(i, j, si, ni);
+  if (!cfg)
+  {
+    return eheigh;
+  }
+  else
+  {
+    return cfg->get_prop(name, w);
+  }
 }
 
 Config*& EnergeForceDatabase::at_wtr(int dim1, int dim2)
@@ -287,7 +327,7 @@ double EnergeForceDatabase::H_energy(Config& config)
     double eps = m_pDS->m_params["HC-OW"].dim2[0];
     double sig =  m_pDS->m_params["HC-OW"].dim2[1];
 
-    double r = Coord::distance(m_mole1.m_atoms[i].m_coord, config.m_xmole2[0].m_coord);
+    double r = distance(m_mole1.m_atoms[i].m_coord, config.m_xmole2[0].m_coord);
 
     res += (m_pDS->*(m_pDS->m_lj))(r, eps, sig);
     double q0 = m_pDS->m_params["qHC"].dim1;
@@ -299,7 +339,7 @@ double EnergeForceDatabase::H_energy(Config& config)
 
     for (int j=0; j<3; j++)
     {
-      r = Coord::distance(m_mole1.m_atoms[i].m_coord, config.m_xmole2[j].m_coord);
+      r = distance(m_mole1.m_atoms[i].m_coord, config.m_xmole2[j].m_coord);
       res += (m_pDS->*(m_pDS->m_lj))(r, eps, sig);
       res += charge(m_pDS->m_params["qHC"].dim1, m_pDS->m_params["qHW"].dim1, r);
     }
@@ -311,4 +351,58 @@ double EnergeForceDatabase::H_energy(Config& config)
 double EnergeForceDatabase::charge(double q0, double q1, double r)
 {
   return q0*q1/r*332.5;
+}
+
+std::pair<double, double> weights_for_2_configs(const vector<double>& norm_vec, const vector<database::Atom> config1, const vector<database::Atom> config2, double cut=0.0000001)
+{
+  std::vector<double> vec1 = get_normal_unit(subtraction(config1[1].m_coord, config1[0].m_coord),
+                                             subtraction(config1[2].m_coord, config1[0].m_coord));
+
+  std::vector<double> vec2 = get_normal_unit(subtraction(config2[1].m_coord, config2[0].m_coord),
+                                             subtraction(config2[2].m_coord, config2[0].m_coord));
+
+  // treat vec1 as the x-axis, the normal of (vec1,vec2) as the z-axis
+  std::vector<double>& vx = vec1;
+  std::vector<double> vz = get_normal_unit(vec1, vec2);
+  // np.cross
+  std::vector<double> vy = {vz[1]*vx[2] - vz[2]*vx[1], vz[2]*vx[0]-vz[0]*vx[2], vz[0]*vx[1]-vz[1]*vx[0]};
+
+  // project the "norm_vec" to the plane of vec1 and vec2, then use symmetry operation.
+  double px = dot(norm_vec, vx);
+  double py = dot(norm_vec, vy);
+
+  double w1, w2;
+  if (abs(px) < cut)
+  {
+    if (py > 0) w2 = 1.0;
+    else w2 = -1.0;
+    w1 = 0.0;
+  }
+  else
+  {
+    double ang = atan(py / px);
+
+    if (px < 0) ang += M_PI;
+    else if (py < 0) ang += 2*M_PI;
+
+    double period = M_PI;
+
+    int nrot = ang / period;
+    double rrot = ang - period * nrot;
+
+    double ang2;
+    if ((rrot - M_PI/2.0)>0.0)
+    {
+      ang2 = M_PI - rrot;
+    }
+    else
+    {
+      ang2 = rrot;
+    }
+
+    w2 = ang2 / (M_PI / 2);
+    w1 = 1 - w2;
+  }
+
+  return {w1, w2};
 }

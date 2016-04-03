@@ -1,14 +1,18 @@
 #include "./qm_interpolation.h"
+#include "likely/TriCubicInterpolator.h"
+
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <fstream>
+#include <exception>
 
 using namespace QM;
 
 /**
  * Atom definition
  */
+
 GjfAtom::GjfAtom(std::string line)
 {
   std::vector<std::string> fields;
@@ -192,6 +196,324 @@ void Coordinates::spherical_x()
 }
 
 /**
+ *According to the coords of the 1st atom in mole2.
+ */
+void Coordinates::MirrorAll()
+{
+
+  vector<double> tmpXZ = {0, 0, -1};
+  for (std::string face: m_pDS->m_symface)
+  {
+    int fndx = m_facendx[face.c_str()];
+
+    double tempang2;
+    bool isMillorXZ = false;
+    // Ben
+    if (fndx == 6)
+    {
+      //Rotate to xz (+-)30.0:
+      if (m_ang2 < 0)
+      {
+        tempang2 = m_ang2 + 2.0 * M_PI;
+      }
+      else
+      {
+        tempang2 = m_ang2;
+      }
+
+      double period = M_PI / 3.0;
+      int nrot = tempang2 / period;
+      double rrot = tempang2 - period * nrot;
+
+      if (rrot - M_PI / 6.0 > 0.0)
+      {
+        nrot ++;
+        isMillorXZ = true;
+      }
+      else
+      {
+        isMillorXZ = false;
+      }
+
+      for (size_t i=m_n1; i<m_atoms.size(); i++)
+      {
+        m_atoms[i]->m_x = rotate(m_atoms[i]->m_x, tmpXZ, nrot * period);
+      }
+      if (isMillorXZ)
+      {
+        for (size_t i=m_n1; i<m_atoms.size(); i++)
+        {
+          m_atoms[i]->m_x[1] *= -1;
+        }
+      }
+      continue;
+    }
+    else if (fndx == 5)
+    {
+      //Rotate to xz (+-)60.0:
+      if (m_ang2 < 0)
+      {
+        tempang2 = m_ang2 + 2.0 * M_PI;
+      }
+      else
+      {
+        tempang2 = m_ang2;
+      }
+
+      double period = M_PI / 3.0 * 2;
+      int nrot = tempang2 / period;
+      double rrot = tempang2 - period * nrot;
+
+      if (rrot - M_PI / 3.0 > 0.0)
+      {
+        nrot ++;
+        isMillorXZ = true;
+      }
+      else
+      {
+        isMillorXZ = false;
+      }
+
+      for (size_t i=m_n1; i<m_atoms.size(); i++)
+      {
+        m_atoms[i]->m_x = rotate(m_atoms[i]->m_x, tmpXZ, nrot * period);
+      }
+      if (isMillorXZ)
+      {
+        for (size_t i=m_n1; i<m_atoms.size(); i++)
+        {
+          m_atoms[i]->m_x[1] *= -1;
+        }
+      }
+      continue;
+    }
+
+
+    // others
+    if (m_center2[fndx] < 0.0)
+    {
+      m_symm[fndx] = -1;
+
+      for (size_t i=m_n1; i<m_atoms.size(); i++)
+      {
+        m_atoms[i]->m_x[fndx] *= -1;
+        m_atoms[i]->m_f[fndx] *= -1;
+      }
+    }
+  }
+
+  spherical_x();
+}
+
+void Coordinates::indexing()
+{
+  if (!m_is_oriented)
+  {
+    throw std::invalid_argument("Error: indexing beforce reorientation");
+  }
+
+  double r = m_r;
+  double ang1 = m_ang1;
+  double ang2 = m_ang2;
+
+  // ndx of r
+  int ir = 10001;
+  ir = get_index(r, m_pDS->m_R_NDX);
+  if (ir > 10000 || ir < 0)
+  {
+    m_ir = ir;
+    m_ig = 0;
+    m_vbis = {0, 0, 0};
+    m_vnrm = {0 ,0, 0};
+    return;
+  }
+  int ih = get_index(ang1, m_pDS->m_PHI_angles);
+
+  int ip = -1;
+  for (size_t i=1; i<(size_t)m_pDS->m_NTheta[ih]; i++)
+  {
+    if (ang2 <= m_pDS->m_THETA_angles[ih][i])
+    {
+      ip = i - 1;
+      break;
+    }
+  }
+
+  if (ip == -1)
+  {
+    ip = m_pDS->m_NTheta[ih] - 1;
+  }
+
+  //ig is the index of all the grids
+  int ig = 0;
+  for (int theta: m_pDS->m_NTheta)
+  {
+    ig += theta;
+  }
+  ig += ip;
+
+  //calculate the vectors of bisector and normal of mole2
+  vector<double>& a20 = m_atoms[m_n1]->m_x;
+  vector<double>& a21 = m_atoms[m_n1 + 1]->m_x;
+  vector<double>& a22 = m_atoms[m_n1 + 2]->m_x;
+
+  vector<double> v0 = subtraction(a21, a20);
+  vector<double> v1 = subtraction(a22, a20);
+
+  //These two vectors must be unit vector
+  vector<double> bisect = get_bisect_unit(v0, v1);
+  vector<double> normal = get_normal_unit(v0, v1);
+
+  //relative coords of mole2 in the cubic of the 8 corners
+  r -= m_pDS->m_R_NDX[ir];
+  ang1 = m_pDS->m_PHI_angles[ih];
+  ang2 = m_pDS->m_THETA_angles[ih][ip];
+  double xr = r / m_pDS->m_DR[ir];
+
+  double tr = ang1 / (m_pDS->m_PHI_angles[ih+1] - m_pDS->m_PHI_angles[ih]);
+  double pr;
+
+  if (ip == m_pDS->m_NTheta[ih]-1)
+  {
+    pr = ang2 / (2 * M_PI + m_pDS->m_THETA_angles[ih][0] - m_pDS->m_THETA_angles[ih][ip]);
+  }
+  else
+  {
+    pr = ang2 / (m_pDS->m_THETA_angles[ih][ip+1] - m_pDS->m_THETA_angles[ih][ip]);
+  }
+  m_ir = ir;
+  m_ig = ig;
+
+  // xr: distance
+  // tr: Phi angle (between xr to z axis)
+  // pr: Theta angle (between xr to xz face)
+  m_rel_x = {xr, tr, pr};
+  m_vbis = bisect;
+  m_vnrm = normal;
+}
+
+int Coordinates::get_index(double r, const vector<double>& vec)
+{
+  int res = 0;
+  if (r < vec[0])
+  {
+    res = -1;
+  }
+  else
+  {
+    for (size_t i=1; i<vec.size(); i++)
+    {
+      if (r <= vec[i])
+      {
+        res = i - 1;
+        break;
+      }
+    }
+  }
+
+  return res;
+
+}
+
+
+void Coordinates::calt_conf_energy(database::EnergeForceDatabase& allconfig, bool isForce=false, double ehigh=100.0)
+{
+  double ri = m_ir;
+
+  if (ri > 100.0)
+  {
+    m_properties = {{"E", 0.0}};
+  }
+  if (ri < 0.0)
+  {
+    m_properties = {{"E", ehigh}};
+  }
+
+  double gi = m_ig;
+  vector<double> relative_x = m_rel_x;
+  vector<double> bisv = m_vbis;
+  vector<double> nrmv = m_vnrm;
+
+  double wghx, wghy;
+  vector<int> grids_sub_ndx = weights_in_subsection(bisv, wghx, wghy);
+
+  std::map<std::string, std::vector<double>> properties = {{"E", {}}};
+  std::vector<std::string> propname = {"E"};
+
+  //if (isForce)
+  //{
+  //  for (size_t i=0; i<m_atoms.size(); i++)
+  //  {
+  //    for (size_t j=0; j<3; j++)
+  //    {
+  //      char name[7];
+  //      sprintf(name, "f%3d%3d", i, j);
+  //      properties[name] = {};
+  //      propname.push_back(name);
+  //    }
+  //  }
+  //}
+  for (int i=ri; i<ri+2; i++)
+  {
+    for (int j: m_pDS->m_grid_data[gi])
+    {
+      std::map<std::string, std::vector<double>> prop = {{"E", {}}};
+
+      for (int ni: grids_sub_ndx)
+      {
+        std::vector<database::Atom> xconf0 = allconfig.at_all(i, j, ni, 0)->m_xmole2;
+        std::vector<database::Atom> xconf1 = allconfig.at_all(i, j, ni, 1)->m_xmole2;
+
+        std::pair<double, double> w = database::weights_for_2_configs(nrmv, xconf0, xconf1);
+
+        for (std::string pp: propname)
+        {
+          double p0 = allconfig.get_prop(i, j, ni, 0, pp, w.first, ehigh);
+          double p1 = allconfig.get_prop(i, j, ni, 1, pp, w.second, ehigh);
+
+          prop[pp].push_back(p1 * abs(w.second) + p0 * abs(w.first));
+        }
+      }
+
+      for (std::string pp: propname)
+      {
+        vector<double>& tmp = prop[pp];
+        double psub = bilinear(tmp[0], tmp[1], tmp[2], tmp[3], wghx, wghy);
+
+        properties[pp].push_back(psub);
+      }
+
+      m_properties = {};
+      for (std::string pp: propname)
+      {
+         double pCubic[8] = {
+           properties[pp][0], properties[pp][4],
+           properties[pp][2], properties[pp][6],
+           properties[pp][1], properties[pp][5],
+           properties[pp][3], properties[pp][7],
+         };
+
+         likely::TriCubicInterpolator grids8(pCubic, 1.0, 1.0, 1.0);
+         m_properties[pp] = grids8.test(relative_x[0], relative_x[1], relative_x[2]);
+      }
+
+      if (isForce)
+      {
+        // TODO  Add ImMirrorForce function, as in this version it no used
+        // so just ignore it
+        // ImMirrorForce();
+      }
+    }
+  }
+}
+
+
+double Coordinates::get_interp_energy()
+{
+  return m_properties["E"];
+}
+
+/**
  * QMInterpolation definition
  */
 const std::vector<std::vector<int> > QMInterpolation::m_aa_ndx = {{1, 2, 3}};
@@ -199,11 +521,12 @@ const std::vector<int> QMInterpolation::m_c_ndx = {1};
 const std::vector<int> QMInterpolation::m_H_ndx = {2,3,4};
 const std::vector<int> QMInterpolation::m_prob_ndx = {4,5,6};
 
-QMInterpolation::QMInterpolation(std::string fftype):
-  m_fftype(fftype)
+QMInterpolation::QMInterpolation(std::string fftype, database::EnergeForceDatabase& allconfig):
+  m_fftype(fftype), m_allconfig(allconfig)
 {};
 
-void QMInterpolation::process(std::string filename)
+// return the output string, then write to file
+std::string QMInterpolation::process(std::string filename)
 {
   std::ifstream ifs(filename);
 
@@ -245,6 +568,8 @@ void QMInterpolation::process(std::string filename)
   }
   ifs.close();
 
+  double test = 0;
+  vector<double> dist = {};
   for (size_t i=0; i<m_aa_ndx.size(); i++)
   {
     const std::vector<int>& mndx = m_aa_ndx[i];
@@ -264,7 +589,25 @@ void QMInterpolation::process(std::string filename)
     {
       interp.addAtom(lines[ind-1], "gms");
     }
+
+    interp.ReorientToOrigin();
+    interp.MirrorAll();
+    try
+    {
+       interp.indexing();
+    } catch (std::invalid_argument &e)
+    {
+      fprintf(stderr, "%s\n", name_str);
+    }
+
+    interp.calt_conf_energy(m_allconfig);
+
+    test += interp.get_interp_energy();
+    dist.push_back(interp.m_r);
   }
 
+  char res[100];
+  sprintf(res, "%s %12.7f %.3f", filename.c_str(), test, dist[0]);
 
+  return std::string(res);
 }
