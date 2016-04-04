@@ -46,6 +46,7 @@ static std::map<int, int> SwapH = {{0,0}, {1,1}, {2,2}, {3,3}, {4,5}, {5,4}};
 double Config::get_prop(std::string name, double w)
 {
   if (name == "E") return m_energy;
+  else return 0;
 
   // TODO Here will not reach Now
   //int i = boost::lexical_cast<int>(name.substr(1, 3));
@@ -120,7 +121,7 @@ Config*& EnergeForceDatabase::at_all(int dim1, int dim2, int dim3, int dim4)
 double EnergeForceDatabase::get_prop(int i, int j, int si, int ni, std::string name, double w, double eheigh=100.0)
 {
   if (i < 0) return eheigh;
-  else if (i > m_pDS->m_R_NDX.size() - 1) return 0.0;
+  else if (i > int(m_pDS->m_R_NDX.size()) - 1) return 0.0;
 
   Config*& cfg = at_all(i, j, si, ni);
   if (!cfg)
@@ -353,7 +354,7 @@ double EnergeForceDatabase::charge(double q0, double q1, double r)
   return q0*q1/r*332.5;
 }
 
-std::pair<double, double> weights_for_2_configs(const vector<double>& norm_vec, const vector<database::Atom> config1, const vector<database::Atom> config2, double cut=0.0000001)
+std::pair<double, double> database::weights_for_2_configs(const vector<double>& norm_vec, const vector<database::Atom> config1, const vector<database::Atom> config2, double cut)
 {
   std::vector<double> vec1 = get_normal_unit(subtraction(config1[1].m_coord, config1[0].m_coord),
                                              subtraction(config1[2].m_coord, config1[0].m_coord));

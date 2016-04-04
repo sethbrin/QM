@@ -89,9 +89,9 @@ vector<double> get_normal(const vector<double>& vec1, const vector<double>& vec2
   assert(vec1.size() == 3);
   assert(vec2.size() == 3);
   vector<double> res(3,0.0);
-  res[0] = vec1[1] * vec2[2] - vec2[1] * vec1[2];
-  res[1] = vec1[2] * vec2[0] - vec2[2] * vec1[0];
-  res[2] = vec1[0] * vec2[1] - vec2[1] * vec1[0];
+  res[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1];
+  res[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2];
+  res[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0];
   return res;
 
 }
@@ -252,21 +252,24 @@ vector<int> weights_in_subsection(const vector<double>& bisvec, double& wghx, do
     }
   }
 
-  //  Bilinear interpolation is used 
-  //      for the interpolation in a sub-section of a quadrant:
-  //  Three SUBSECTIONS: below is a quadrant with three sub-sections:
-  //       z
-  //      / \
-  //     /   \
-  //    c     b
-  //   /  \o/  \
-  //  /    |    \
-  // x-----a-----y
-  // 
-  // subsection 0: x-a-o-c (0-1-4-3)
-  //            1: y-b-o-a
-  //            2: z-c-o-b
-  //  indices of axis: 0, 1, 2, 3, 4 (3,4 for cyclic call)
+  /*
+   **
+   * Bilinear interpolation is used 
+   *     for the interpolation in a sub-section of a quadrant:
+   * Three SUBSECTIONS: below is a quadrant with three sub-sections:
+   *      z
+   *     / \
+   *    /   \
+   *   c     b
+   *  /  \o/  \
+   * /    |    \
+   *x-----a-----y
+   *
+   *subsection 0: x-a-o-c (0-1-4-3)
+   *           1: y-b-o-a
+   *           2: z-c-o-b
+   * indices of axis: 0, 1, 2, 3, 4 (3,4 for cyclic call)
+  */
   std::map<std::string, std::map<int, std::vector<double>>> ax = {
         {"111",{{0,{0,1,2}}, {1,{1,2,0}}, {2,{2,0,1}}}},
         {"100",{{0,{0,1,2}}, {1,{1,2,0}}, {2,{2,0,1}}}},

@@ -66,9 +66,9 @@ namespace database
     virtual void degree2radius();
     virtual void set_H_correction(bool flag);
 
-    virtual std::pair<std::vector<double>, std::vector<double> > calt_vec1(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
-    virtual std::pair<std::vector<double>, std::vector<double> > calt_vec2(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
-    virtual std::vector<double> calt_dvec(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
+    virtual std::pair<std::vector<double>, std::vector<double> > calt_vec1(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
+    virtual std::pair<std::vector<double>, std::vector<double> > calt_vec2(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
+    virtual std::vector<double> calt_dvec(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
 
     double lj_12_6(double r, double eps, double sig);
     double lj_9_6(double r, double eps, double sig);
@@ -87,9 +87,9 @@ namespace database
     void set_num_of_atoms();
     void set_H_correction(bool flag);
 
-    std::pair<std::vector<double>, std::vector<double> > calt_vec1(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
-    std::pair<std::vector<double>, std::vector<double> > calt_vec2(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
-    std::vector<double> calt_dvec(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
+    virtual std::pair<std::vector<double>, std::vector<double> > calt_vec1(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
+    virtual std::pair<std::vector<double>, std::vector<double> > calt_vec2(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
+    virtual std::vector<double> calt_dvec(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
   };
 
   class WaterStructure : public PrpStructure
@@ -100,9 +100,9 @@ namespace database
     void set_theta();
     void set_H_correction(bool flag);
 
-    std::pair<std::vector<double>, std::vector<double> > calt_vec1(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
-    std::pair<std::vector<double>, std::vector<double> > calt_vec2(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
-    std::vector<double> calt_dvec(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c);
+    virtual std::pair<std::vector<double>, std::vector<double> > calt_vec1(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
+    virtual std::pair<std::vector<double>, std::vector<double> > calt_vec2(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
+    virtual std::vector<double> calt_dvec(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
 
     //virtual void set_num_of_atoms();
   private:

@@ -1,5 +1,5 @@
-#include "./qm_interpolation.h"
-#include "likely/TriCubicInterpolator.h"
+#include "qm_interpolation.h"
+#include "TriCubicInterpolator.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -102,7 +102,6 @@ void Coordinates::addAtom(std::string& line, const std::string& ftype)
 void Coordinates::ReorientToOrigin(double cut=0.0000001)
 {
   int cnt_of_atoms = m_atoms.size();
-  assert(cnt_of_atoms == 3);
   std::vector<double> dvec = m_pDS->calt_dvec(m_atoms[0]->m_x, m_atoms[1]->m_x, m_atoms[2]->m_x);
 
   for (int i=0; i<cnt_of_atoms; i++)

@@ -237,21 +237,21 @@ void DataStructure::set_grid_data(const char* structure_type)
   }
 }
 
-std::pair<std::vector<double>, std::vector<double> > DataStructure::calt_vec1(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+std::pair<std::vector<double>, std::vector<double> > DataStructure::calt_vec1(const std::vector<double>& a0, const std::vector<double>& a1, const std::vector<double>& a2)
 {
   assert(a0.size() == a1.size());
   assert(a0.size() == a2.size());
   return std::pair<std::vector<double>, std::vector<double> >(a0, {1, 0, 0});
 }
 
-std::pair<std::vector<double>, std::vector<double> > DataStructure::calt_vec2(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+std::pair<std::vector<double>, std::vector<double> > DataStructure::calt_vec2(const std::vector<double>& a0, const std::vector<double>& a1, const std::vector<double>& a2)
 {
   assert(a0.size() == a1.size());
   assert(a0.size() == a2.size());
   return std::pair<std::vector<double>, std::vector<double> >(a1, {0, 1, 0});
 }
 
-std::vector<double> DataStructure::calt_dvec(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+std::vector<double> DataStructure::calt_dvec(const std::vector<double>& a0, const std::vector<double>& a1, const std::vector<double>& a2)
 {
   assert(a0.size() == a1.size());
   assert(a0.size() == a2.size());
@@ -341,30 +341,32 @@ void PrpStructure::set_H_correction(bool flag)
   m_Hmm = {1,2,3,8,9,10};
 }
 
-std::pair<std::vector<double>, std::vector<double> > PrpStructure::calt_vec1(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+std::pair<std::vector<double>, std::vector<double> > PrpStructure::calt_vec1(const std::vector<double>& a0, const std::vector<double>& a1, const std::vector<double>& a2)
 {
   assert(a0.size() == a1.size());
   assert(a0.size() == a2.size());
   return std::pair<std::vector<double>, std::vector<double> >(a1, {1, 0, 0});
 }
 
-std::pair<std::vector<double>, std::vector<double> > PrpStructure::calt_vec2(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+std::pair<std::vector<double>, std::vector<double> > PrpStructure::calt_vec2(const std::vector<double>& a0, const std::vector<double>& a1, const std::vector<double>& a2)
 {
   assert(a0.size() == a1.size());
   assert(a0.size() == a2.size());
 
   int size = a0.size();
+  std::vector<double> tmpa0(a0.size(), 0);
+  std::vector<double> tmpa2(a0.size(), 0);
 
   for (int i=0; i<size; i++)
   {
-    a0[i] -= a1[i];
-    a2[i] -= a1[i];
+    tmpa0[i] = a0[i] - a1[i];
+    tmpa2[i] = a2[i] - a1[i];
   }
 
-  return std::pair<std::vector<double>, std::vector<double> >(get_normal(a0, a2), {0,0,1});
+  return std::pair<std::vector<double>, std::vector<double> >(get_normal(tmpa0, tmpa2), {0,0,1});
 }
 
-std::vector<double> PrpStructure::calt_dvec(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+std::vector<double> PrpStructure::calt_dvec(const std::vector<double>& a0, const std::vector<double>& a1, const std::vector<double>& a2)
 {
   assert(a0.size() == a1.size());
   assert(a0.size() == a2.size());
@@ -407,19 +409,21 @@ void WaterStructure::set_theta()
   };
 }
 
-std::pair<std::vector<double>, std::vector<double> > WaterStructure::calt_vec1(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+std::pair<std::vector<double>, std::vector<double> > WaterStructure::calt_vec1(const std::vector<double>& a0, const std::vector<double>& a1, const std::vector<double>& a2)
 {
   assert(a0.size() == a1.size());
   assert(a0.size() == a2.size());
   int size = a0.size();
+
+  std::vector<double> tmp(a0.size(), 0);
   for (int i=0; i<size; i++)
   {
-    a0[i] = (a1[i] + a2[i]) * 0.5;
+    tmp[i] = (a1[i] + a2[i]) * 0.5;
   }
-  return std::pair<std::vector<double>, std::vector<double> >(a0, {1, 0, 0});
+  return std::pair<std::vector<double>, std::vector<double> >(tmp, {1, 0, 0});
 }
 
-std::pair<std::vector<double>, std::vector<double> > WaterStructure::calt_vec2(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+std::pair<std::vector<double>, std::vector<double> > WaterStructure::calt_vec2(const std::vector<double>& a0, const std::vector<double>& a1, const std::vector<double>& a2)
 {
   assert(a0.size() == a1.size());
   assert(a0.size() == a2.size());
@@ -427,12 +431,12 @@ std::pair<std::vector<double>, std::vector<double> > WaterStructure::calt_vec2(s
   return std::pair<std::vector<double>, std::vector<double> >(get_normal(a2, a1), {0,0,1});
 }
 
-std::vector<double> WaterStructure::calt_dvec(std::vector<double>& a0, std::vector<double>& a1, std::vector<double>& a2)
+std::vector<double> WaterStructure::calt_dvec(const std::vector<double>& a0, const std::vector<double>& a1, const std::vector<double>& a2)
 {
   assert(a0.size() == a1.size());
   assert(a0.size() == a2.size());
   int size = a0.size();
-  std::vector<double> res(0, size);
+  std::vector<double> res(size, 0);
 
   for (int i=0; i<size; i++)
   {

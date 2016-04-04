@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign
-AM_CXXFLAGS = -fpic -Wall -Wextra -Wno-unused-parameter -std=c++11
+AM_CXXFLAGS = -fpic -Wall -Wextra -Wno-unused-parameter -std=c++11 -O0
 
 bin_PROGRAMS=qm
 qm_SOURCES= main.cpp \
@@ -8,7 +8,7 @@ qm_SOURCES= main.cpp \
 						common.cpp \
 						qm_interpolation.cpp \
 						gzstream/gzstream.h \
-						likely/TriCubicInterpolator.h\
+						TriCubicInterpolator.cpp\
 						#trans_rot_coords.h
 
 qm_LDADD = -lz -L./gzstream -lgzstream
