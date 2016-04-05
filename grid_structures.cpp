@@ -62,7 +62,7 @@ void DataStructure::set_R()
 
   for (int i=0; i<size-1; i++)
   {
-    m_DR.push_back(m_R_NDX[i+1] - m_R_NDX[0]);
+    m_DR.push_back(m_R_NDX[i+1] - m_R_NDX[i]);
   }
   m_DR.push_back(0);
 }
@@ -175,7 +175,7 @@ DataStructure::DataStructure(const char* fftype="14-7"): m_fftype(fftype)
 // Set the grid data of the structure_type
 void DataStructure::set_grid_data(const char* structure_type)
 {
-  if (strcmp(structure_type, "wtr"))
+  if (strcmp(structure_type, "wtr") == 0)
   {
     m_grid_data = {
          {0, { 0, 1, 13, 14}} ,

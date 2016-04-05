@@ -13,11 +13,6 @@ local::TriCubicInterpolator::TriCubicInterpolator(double* data, double spacing, 
         _n3 = _n2 = _n1;
     }
 
-    for (int i=0; i<8; i++)
-    {
-      printf("%lf  ", data[i]);
-    }
-    printf("\n");
 }
 
 local::TriCubicInterpolator::~TriCubicInterpolator() { }

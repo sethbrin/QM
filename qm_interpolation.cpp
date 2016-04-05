@@ -130,13 +130,13 @@ void Coordinates::ReorientToOrigin(double cut=0.0000001)
     m_pDS->calt_vec2(m_atoms[0]->m_x, m_atoms[1]->m_x, m_atoms[2]->m_x);
 
   ang = angle(tmp_pair.first, tmp_pair.second);
-  if (std::abs(ang) < cut)
+  if (fabs(ang) < cut)
   {
     return;
   }
   else
   {
-    if (std::abs(ang - M_PI) < cut)
+    if (std::fabs(ang - M_PI) < cut)
     {
       ax = {1,0,0};
     }
@@ -159,12 +159,12 @@ void Coordinates::ReorientToOrigin(double cut=0.0000001)
 //Calculate the coords in spherical coordination system for molecule 2
 void Coordinates::spherical_x()
 {
-   vector<double> x = m_atoms[m_n1]->m_x;
+   vector<double>& x = m_atoms[m_n1]->m_x;
    double r = ::sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2]);
 
    double ang1 = M_PI * 0.5 - ::acos(x[2] / r);
    double ang2;
-   if (::abs(x[0] < 0.000001))
+   if (fabs(x[0]) < 0.000001)
    {
      if (x[1] > 0)
      {
@@ -182,7 +182,7 @@ void Coordinates::spherical_x()
      {
        ang2 += M_PI;
      }
-     else
+     else if (x[1] < 0)
      {
        ang2 += M_PI * 2;
      }
@@ -203,7 +203,7 @@ void Coordinates::MirrorAll()
   vector<double> tmpXZ = {0, 0, -1};
   for (std::string face: m_pDS->m_symface)
   {
-    int fndx = m_facendx[face.c_str()];
+    int fndx = m_facendx[face];
 
     double tempang2;
     bool isMillorXZ = false;
@@ -345,9 +345,9 @@ void Coordinates::indexing()
 
   //ig is the index of all the grids
   int ig = 0;
-  for (int theta: m_pDS->m_NTheta)
+  for (int i=0; i<ih; i++)
   {
-    ig += theta;
+    ig += m_pDS->m_NTheta[i];
   }
   ig += ip;
 
@@ -365,8 +365,8 @@ void Coordinates::indexing()
 
   //relative coords of mole2 in the cubic of the 8 corners
   r -= m_pDS->m_R_NDX[ir];
-  ang1 = m_pDS->m_PHI_angles[ih];
-  ang2 = m_pDS->m_THETA_angles[ih][ip];
+  ang1 -= m_pDS->m_PHI_angles[ih];
+  ang2 -= m_pDS->m_THETA_angles[ih][ip];
   double xr = r / m_pDS->m_DR[ir];
 
   double tr = ang1 / (m_pDS->m_PHI_angles[ih+1] - m_pDS->m_PHI_angles[ih]);
@@ -470,7 +470,7 @@ void Coordinates::calt_conf_energy(database::EnergeForceDatabase& allconfig, boo
           double p0 = allconfig.get_prop(i, j, ni, 0, pp, w.first, ehigh);
           double p1 = allconfig.get_prop(i, j, ni, 1, pp, w.second, ehigh);
 
-          prop[pp].push_back(p1 * abs(w.second) + p0 * abs(w.first));
+          prop[pp].push_back(p1 * fabs(w.second) + p0 * fabs(w.first));
         }
       }
 
@@ -482,28 +482,31 @@ void Coordinates::calt_conf_energy(database::EnergeForceDatabase& allconfig, boo
         properties[pp].push_back(psub);
       }
 
-      m_properties = {};
-      for (std::string pp: propname)
-      {
-         double pCubic[8] = {
-           properties[pp][0], properties[pp][4],
-           properties[pp][2], properties[pp][6],
-           properties[pp][1], properties[pp][5],
-           properties[pp][3], properties[pp][7],
-         };
-
-         likely::TriCubicInterpolator grids8(pCubic, 1.0, 1.0, 1.0);
-         m_properties[pp] = grids8.test(relative_x[0], relative_x[1], relative_x[2]);
-      }
-
-      if (isForce)
-      {
-        // TODO  Add ImMirrorForce function, as in this version it no used
-        // so just ignore it
-        // ImMirrorForce();
-      }
     }
   }
+  m_properties = {};
+  for (std::string pp: propname)
+  {
+    double pCubic[8] = {
+      properties[pp][0], properties[pp][4],
+      properties[pp][2], properties[pp][6],
+      properties[pp][1], properties[pp][5],
+      properties[pp][3], properties[pp][7],
+    };
+
+    // occording to the likely.pyx
+    likely::TriCubicInterpolator grids8(pCubic, 1.0, 2, 2, 2);
+    double stepx=1.0, stepy=1.0,stepz=1.0;
+    m_properties[pp] = grids8.test(relative_x[0]/stepx, relative_x[1]/stepy, relative_x[2]/stepz);
+  }
+
+  if (isForce)
+  {
+    // TODO  Add ImMirrorForce function, as in this version it no used
+    // so just ignore it
+    // ImMirrorForce();
+  }
+
 }
 
 

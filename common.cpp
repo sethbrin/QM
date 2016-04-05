@@ -62,10 +62,10 @@ vector<double> rotate(const vector<double>& vec, const vector<double>& axis, dou
   vector<vector<double>> rotmat = {{a*a+b*b-c*c-d*d,2*(b*c-a*d),2*(b*d+a*c)},{2*(b*c+a*d), a*a+c*c-b*b-d*d, 2*(c*d-a*b)},
     {2*(b*d-a*c), 2*(c*d+a*b), a*a+d*d-b*b-c*c}};
 
-  vector<double> res;
+  vector<double> res(rotmat.size(), 0);
   for(unsigned int i=0; i< rotmat.size();i++)
   {
-    res.push_back(dot(rotmat[i],vec));
+    res[i] = dot(rotmat[i], vec);
   }
   return res;
 
@@ -137,8 +137,13 @@ vector<double> get_bisect_unit(const vector<double>& a, const vector<double>& b)
 
 void get_unit(vector<double>& vec)
 {
-  double sum = accumulate(vec.begin(), vec.end(), 0);
 
+  double sum = 0;
+  for (double& item: vec)
+  {
+    sum += item * item;
+  }
+  sum = ::sqrt(sum);
   for (double& item: vec)
   {
     item /= sum;
@@ -284,11 +289,11 @@ vector<int> weights_in_subsection(const vector<double>& bisvec, double& wghx, do
   // angx is calculated by arctan(dy/dx)
   double tempx = bisvec[ax[quad_ndx][subndx][0]];
   double tempy = bisvec[ax[quad_ndx][subndx][1]];
-  double angx = std::atan(abs(tempy / tempx));
+  double angx = std::atan(fabs(tempy / tempx));
 
   // angy is calculated by arctan(dy/dx):
   double tempz = bisvec[ax[quad_ndx][subndx][2]];
-  double angy = std::atan(abs(tempz));
+  double angy = std::asin(fabs(tempz));
   // Bilinear:
   //
   //  y3<----y2

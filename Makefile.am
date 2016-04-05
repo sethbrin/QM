@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign
-AM_CXXFLAGS = -fpic -Wall -Wextra -Wno-unused-parameter -std=c++11 -O0
+AM_CXXFLAGS = -fpic -Wall -Wextra -Wno-unused-parameter -std=c++11 -O2 #-DUSE_THREADS
 
 bin_PROGRAMS=qm
 qm_SOURCES= main.cpp \
@@ -11,4 +11,4 @@ qm_SOURCES= main.cpp \
 						TriCubicInterpolator.cpp\
 						#trans_rot_coords.h
 
-qm_LDADD = -lz -L./gzstream -lgzstream
+qm_LDADD = -lz -L./gzstream -lgzstream -lboost_filesystem -lboost_system -lboost_thread

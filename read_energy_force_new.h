@@ -38,7 +38,7 @@ namespace database
     void setName(std::string name);
     int m_n1;
     int m_n2;
-    int m_energy;
+    double m_energy;
     std::string m_name;
     std::vector<Atom> m_fmole1;
     std::vector<Atom> m_fmole2;

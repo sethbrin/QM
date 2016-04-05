@@ -99,7 +99,7 @@ namespace QM
     std::string m_name;
     database::DataStructure* m_pDS;
     bool m_is_oriented;
-    std::map<const char*, int> m_facendx;
+    std::map<std::string, int> m_facendx;
     std::vector<int> m_symm;
     int m_center;
     double m_r;

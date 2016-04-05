@@ -373,7 +373,7 @@ std::pair<double, double> database::weights_for_2_configs(const vector<double>& 
   double py = dot(norm_vec, vy);
 
   double w1, w2;
-  if (abs(px) < cut)
+  if (fabs(px) < cut)
   {
     if (py > 0) w2 = 1.0;
     else w2 = -1.0;
