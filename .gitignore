@@ -9,7 +9,6 @@ depcomp/
 Makefile.in
 qm
 random/
-
 .cproject
 .project
 *.gz
