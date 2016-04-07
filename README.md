@@ -22,7 +22,7 @@ export CPLUS_INCLUDE_PATH=$BOOST_PATH/include:$CPLUS_INCLUDE_PATH
 
 4. use following method to compile
 ```
-automake --add-missing
+automake --add-missing && autoconf
 ./configure
 make
 ```
