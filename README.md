@@ -20,6 +20,13 @@ export LIBRARY_PATH=$BOOST_PATH/lib:$LIBRARY_PATH
 export CPLUS_INCLUDE_PATH=$BOOST_PATH/include:$CPLUS_INCLUDE_PATH
 ```
 
+4. use following method to compile
+```
+automake --add-missing
+./configure
+make
+```
+
 Usage
 ----------------
 You can see use `qm -h` to see more infomation

@@ -8,6 +8,6 @@ qm_SOURCES= main.cpp \
             common.cpp \
             qm_interpolation.cpp \
             gzstream/gzstream.h \
-            TriCubicInterpolator.cpp\
+            TriCubicInterpolator.cpp
 
 qm_LDADD = -lz -L./gzstream -lgzstream -lboost_filesystem -lboost_system -lboost_thread

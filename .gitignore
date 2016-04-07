@@ -13,6 +13,11 @@ random/
 .project
 *.gz
 
+install-sh
+missing
+depcomp
+compile
+
 # exvim
 src.exvim
 .exvim.src/
