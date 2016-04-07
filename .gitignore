@@ -17,6 +17,7 @@ install-sh
 missing
 depcomp
 compile
+aclocal.m4
 
 # exvim
 src.exvim
