@@ -26,7 +26,7 @@ install
 ----------------
 1. use following method to compile
 ```
-automake --add-missing && autoconf
+aclocal && automake --add-missing && autoconf
 ./configure
 make
 ```

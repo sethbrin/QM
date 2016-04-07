@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+#AC_PREREQ([2.69])
 AC_INIT([qm], [0.0.1], [zengping10212044@gmail.com])
 AM_INIT_AUTOMAKE
 
