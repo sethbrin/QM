@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <array>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/shared_ptr.hpp>
