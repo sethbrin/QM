@@ -168,7 +168,7 @@ void DataStructure::initialize()
 
 
 
-DataStructure::DataStructure(const char* fftype="14-7"): m_fftype(fftype)
+DataStructure::DataStructure(const char* fftype): m_fftype(fftype)
 {
 }
 
