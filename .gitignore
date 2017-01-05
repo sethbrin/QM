@@ -22,6 +22,10 @@ aclocal.m4
 # exvim
 src.exvim
 .exvim.src/
+python/src.exvim
+python/.exvim.src/
+python/*.pyc
+output
 
 # Compiled Object files
 *.slo

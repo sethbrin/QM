@@ -3,7 +3,7 @@
 import numpy as np
 from copy import deepcopy
 
-np.seterr(all='raise')
+np.seterr(divide='ignore', invalid='ignore')
 
 def translate(vec, dvec):
     return [vec[i]+dvec[i] for i in range(3)]

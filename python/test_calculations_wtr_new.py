@@ -33,7 +33,6 @@ class QM_test_interpolation():
             #                 res += self.charge(DS[self.FT].param['qHC'], DS[self.FT].param['qHW'], r)
 
             # return res
-
     def run_compare_polycen(self, allconfig):
         ## atom indices in residues for fragment locating:
         ## Start from 1 !!!
@@ -193,10 +192,56 @@ class QM_test_interpolation():
 #     res = 4.0*eps*(tr*tr-tr)
 #     return res
 
+class QMInterpolation():
+  def __init__(self, ftype):
+    self.ftype = ftype
+    cur_dir = os.path.split(os.path.realpath(__file__))[0]
+    database_name = 'Dimer_deltaE_data_mp2_wtr_wtr.txt.gz'
+    database_name = cur_dir + os.sep + database_name
+    self.allconf = energy_force_data(database_name, ftype)
 
-if __name__=='__main__': 
+  #
+  # ('O', [8.0,0.10293690, 0.11093940, 0.07435482],
+  #  'H', [8.0,0.10293690, 0.11093940, 0.07435482],
+  #  'H', [8.0,0.10293690, 0.11093940, 0.07435482])
+  def calculate(self, lhs, rhs):
+    interp = coordinates(3,3, self.ftype, 'test')
+    for item in lhs:
+      interp.addgmsatom(item[0], item[1])
+    for item in rhs:
+      interp.addgmsatom(item[0], item[1])
+
+    interp.ReorientToOrigin()
+    interp.MirrorAll()
+    try:interp.indexing()
+    except:
+      raise
+    interp.calt_conf_energy(self.allconf)
+    tempe = interp.get_interp_energy()
+    return (tempe, interp.r)
+
+def test():
+  qm_interpolation = QMInterpolation('wtr')
+  lhs = [('O', [8.0, 0.10293690, 0.11093940, 0.07435482]),
+         ('H', [1.0, 0.73097151, 0.83572755, 0.02040124]),
+         ('H', [1.0, -0.22532655, 0.13689786, 0.97669930])]
+  rhs = [('O', [8.0, 2.85534030, 0.60573860, -1.03993027]),
+         ('H', [1.0, 1.93176673, 0.51127346, -0.79346626]),
+         ('H', [1.0, 3.16776562, -0.29302760, -1.17133059])]
+  print qm_interpolation.calculate(lhs, rhs)
+
+if __name__=='__main__':
+    test()
+    import sys
+    sys.exit()
     resname = 'wtr'
     allconf = energy_force_data('Dimer_deltaE_data_mp2_wtr_wtr.txt.gz', resname)
+    import pickle
+
+    #f = open('water.db', 'wb')
+    #pickle.dump(allconf, f)
+    #f = open('water.db', 'rb')
+    #allconfig = pickle.load(f)
     
     test = QM_test_interpolation(resname)
     test.run_compare_polycen(allconf)
