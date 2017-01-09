@@ -11,7 +11,6 @@ qm
 random/
 .cproject
 .project
-*.gz
 
 install-sh
 missing

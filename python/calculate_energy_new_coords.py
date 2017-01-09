@@ -10,6 +10,11 @@ __version__ = 0.03
 
 AU2KCAL = 23.0605*27.2116
 
+class new_atom_float:
+    def __init__(self, name, coor):
+        self.a_nam = name
+        self.x = coor
+        self.f = [0., 0., 0.]
 
 class new_atom():
     def __init__(self, line, ftype='gjf'):
@@ -17,19 +22,16 @@ class new_atom():
         #        'gms': self.addinp,
         #        'pdb': self.addpdb}
         #self.add[ftype](line)
-        if isinstance(line, basestring):
-          if ftype=='gjf': self.addgjf(line)
-          elif ftype=='gms': self.addinp(line)
-          elif ftype=='pdb': self.addpdb(line)
-        else:
-          self.addgms(line[0], line[1])
+        if ftype=='gjf': self.addgjf(line)
+        elif ftype=='gms': self.addinp(line)
+        elif ftype=='pdb': self.addpdb(line)
 
         self.f = [0.0,0.0,0.0]
 
     def addgjf(self, line):
-                line = line.split()
-                self.a_nam = line[0]
-                self.x = [float(line[1]), float(line[2]), float(line[3])]
+        line = line.split()
+        self.a_nam = line[0]
+        self.x = [float(line[1]), float(line[2]), float(line[3])]
 
     def addpdb(self, line):
         self.line = line
@@ -47,10 +49,6 @@ class new_atom():
         line = line.split()
         self.a_nam = line[0]
         self.x = [float(line[2]), float(line[3]), float(line[4])]
-
-    def addgms(self, name, pos):
-        self.a_nam = name
-        self.x = pos[1:]
 
 class coordinates():
     def __init__(self, n1, n2, FragType, name=''):
@@ -81,13 +79,12 @@ class coordinates():
 
         self.name = name
 
-    def addatom(self, line, ftype='pdb'):
-        temp = new_atom(line, ftype)
-        self.original_atoms.append(temp)
+    def addatomfloat(self, name, coor):
+        self.original_atoms.append(new_atom_float(name, coor))
         self.natoms += 1
 
-    def addgmsatom(self, name, pos):
-        temp = new_atom((name, pos))
+    def addatom(self, line, ftype='pdb'):
+        temp = new_atom(line, ftype)
         self.original_atoms.append(temp)
         self.natoms += 1
 
