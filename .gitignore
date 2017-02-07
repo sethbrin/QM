@@ -1,56 +1,60 @@
 # Automake tmp files
-autom4te.cache/
-*.log
-configure
-Makefile
-config.status
-depcomp/
-.deps/
-Makefile.in
-qm
-random/
-.cproject
-.project
+**/autom4te.cache/
+**/*.log
+**/configure
+**/Makefile
+**/config.status
+**/depcomp/
+**/.deps/
+**/Makefile.in
+**/qm
+**/random/
+**/.cproject
+**/.project
 
-install-sh
-missing
-depcomp
-compile
-aclocal.m4
+**/install-sh
+**/missing
+**/depcomp
+**/compile
+**/aclocal.m4
 
 # exvim
-src.exvim
-.exvim.src/
-python/src.exvim
-python/.exvim.src/
-python/*.pyc
-output
+**/src.exvim
+**/.exvim.src/
+**/python/src.exvim
+**/python/.exvim.src/
+**/python2/src.exvim
+**/python2/.exvim.src/
+
+# pyc
+**/python/*.pyc
+**/python2/*.pyc
 
 # Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+**/*.slo
+**/*.lo
+**/*.o
+**/*.obj
 
 # Precompiled Headers
-*.gch
-*.pch
+**/*.gch
+**/*.pch
 
 # Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+**/*.so
+**/*.dylib
+**/*.dll
 
 # Fortran module files
-*.mod
+**/*.mod
 
 # Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+**/*.lai
+**/*.la
+**/*.a
+**/*.lib
 
 # Executables
-*.exe
-*.out
-*.app
+**/*.exe
+**/*.out
+**/*.app
