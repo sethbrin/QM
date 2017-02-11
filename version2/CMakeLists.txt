@@ -4,7 +4,7 @@ project(version2)
 set(CXX_FLAGS
     -g
     -std=c++11
-    -O0
+    -O3
     )
 
 string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")

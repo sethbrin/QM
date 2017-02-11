@@ -12,6 +12,7 @@ using std::map;
 using std::pair;
 using std::array;
 
+#define ERROR(msg) do {fprintf(stderr, "[E::%s] %s\n", __func__, msg); ::abort();} while(0)
 
 //class Coord
 //{

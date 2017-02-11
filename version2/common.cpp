@@ -393,7 +393,7 @@ pair<double, array<int, 3>> get_neighors_for_normal(const vector<double>& normal
 
         if (ndx2 == nvec - 1) {
             ndx3 = nvec;
-            if (ndx1 == 0) exit(1);
+            if (ndx1 == 0) ERROR("ndx1 == 0");
         } else {
             ndx3 = ndx2 + 1;
         }
@@ -411,7 +411,7 @@ pair<double, array<int, 3>> get_neighors_for_normal(const vector<double>& normal
         if (ndx1 == nvec-1) {
             ndx2 = nvec;
             ndx3 = ndx1 - 1;
-            if (ndx3 == 0) exit(1);
+            if (ndx3 == 0) ERROR("ndx3 == 0");
         } else {
             ndx2 = ndx1 + 1;
             double tmp1 = (ndx2 + 1) * da - ang0;

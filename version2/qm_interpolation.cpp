@@ -813,7 +813,7 @@ void Coordinates::calt_conf_energy(database::EnergeForceDatabase& allconfig, boo
 
             }
 
-            if (psub_r.size() != 3) exit(1);
+            if (psub_r.size() != 3) ERROR("size of psub_r not equal to 3");
 
             std::vector<std::pair<double, double>> points;
             for (int t = 0; t < m_r_ndxs.size(); t++) {
