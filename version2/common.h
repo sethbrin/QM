@@ -66,7 +66,7 @@ void get_unit(vector<double>& vec);
  */
 vector<int> weights_in_subsection(const vector<double>& bisvec, double& wghx, double& wghy, double cutoff=0.9999);
 
-vector<int> weights_for_normal_general(const vector<double>& normal_vec, const vector<vector<double>>& config_vecs, double cutoff=0.0000001);
+void weights_for_normal_general(const vector<double>& normal_vec, const vector<vector<double>>& config_vecs, double& w1, double& w2, int& ndx1, int& ndx2, double cutoff=0.0000001);
 
 pair<double, array<int, 3>> get_neighors_for_normal(const vector<double>& normal_vec, const vector<vector<double>>& config_vecs, double cutoff=0.0000001);
 

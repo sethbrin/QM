@@ -704,6 +704,18 @@ void Coordinates::calt_conf_energy(database::EnergeForceDatabase& allconfig, boo
 
                 if (nvec == 2) {
                     // linear interpolation for normal vectors
+                    double w0, w1;
+                    int ndx0, ndx1;
+                    weights_for_normal_general(nrmv, xvecs, w0, w1, ndx0, ndx1);
+
+                    for (std::string pp: propname) {
+                        double p0 = allconfig.get_prop(i, j, ni, ndx0, pp, w0, ehigh);
+                        double p1 = allconfig.get_prop(i, j, ni, ndx1, pp, w1, ehigh);
+
+                        double p = p1 * std::abs(w1) + p0 * std::abs(w0) ;
+                        prop[pp].push_back(p);
+                    }
+
                 } else if (nvec > 2) {
                     auto  res = get_neighors_for_normal(nrmv, xvecs);
                     double angNorm = res.first;

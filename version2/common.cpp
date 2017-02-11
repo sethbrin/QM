@@ -364,8 +364,47 @@ vector<int> weights_in_subsection(const vector<double>& bisvec, double& wghx, do
  * bisector direction.
  * Linear interpolation is used
  */
-vector<int> weights_for_normal_general(const vector<double>& normal_vec, const vector<vector<double>>& config_vecs, double cutoff) {
-    return {};
+
+void weights_for_normal_general(const vector<double>& normal_vec, const vector<vector<double>>& config_vecs, double& w1, double& w2, int& ndx1, int& ndx2, double cutoff) {
+    int nvec = config_vecs.size();
+    vector<double> vec1 = config_vecs[0];
+    vector<double> vec2 = config_vecs[1];
+
+    vector<double> vx = vec1;
+    vector<double> vz = get_normal_unit(vec1, vec2);
+    vector<double> vy = get_normal(vz, vx);
+
+    double da = M_PI / nvec;
+
+    double px = dot(normal_vec, vx);
+    double py = dot(normal_vec, vy);
+
+    double rrot = 0;
+    if (std::abs(px) < cutoff) {
+        if (py>0) {
+            w2 = 1.0;
+        } else {
+            w2 = -1.0;
+        }
+        w1 = 0;
+        ndx2 = static_cast<int>((M_PI/2)/(M_PI/nvec));
+        ndx1 = ndx2 - 1;
+    } else {
+        double ang = atan(py/px);
+        if (px < 0) {
+            ang += M_PI;
+        } else if (py < 0) {
+            ang += 2 * M_PI;
+        }
+        rrot = ang - static_cast<int>(ang/M_PI) * M_PI;
+    }
+
+    ndx1 = static_cast<int>(rrot / (da));
+    double ang2 = rrot - static_cast<int>(rrot/da) * da;
+    w2 = ang2 / da;
+    w1 = 1 - w2;
+    if (ndx1 == nvec - 1) ndx2 = 0;
+    else ndx2 = ndx1 + 1;
 }
 
 pair<double, array<int, 3>> get_neighors_for_normal(const vector<double>& normal_vec, const vector<vector<double>>& config_vecs, double cutoff) {
