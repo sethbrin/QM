@@ -597,27 +597,27 @@ class coordinates():
                 self.indexing_orient_auto3(i)
                 dtheta_ndx[i] = self.dtheta_ndx[i]
                 if len(dtheta_ndx[i]) == 2: # not in this script
-                    orient_pr =[]
-                    for kk in dtheta_ndx[i]:
-                        ip1=dtheta_ndx[i][kk][0]
-                        ip2=dtheta_ndx[i][kk][1]
-                        if ip1 == 0 and ip2 == 0: # vertex
-                            wtmp = 0
-                        elif ip1 == OrientDS['wtr'].NTheta[kk]-1:
-                            wtmp = (ang2-OrientDS['wtr'].THETA_angles[kk][ip1])/(2*np.pi+OrientDS['wtr'].THETA_angles[kk][0]-OrientDS['wtr'].THETA_angles[kk][ip1])
-                        else:
-                            wtmp = (ang2-OrientDS['wtr'].THETA_angles[kk][ip1])/(OrientDS['wtr'].THETA_angles[kk][ip2]-OrientDS['wtr'].THETA_angles[kk][ip1])
-                        orient_pr.append(wtmp)
+                    #orient_pr =[]
+                    #for kk in dtheta_ndx[i]:
+                    #    ip1=dtheta_ndx[i][kk][0]
+                    #    ip2=dtheta_ndx[i][kk][1]
+                    #    if ip1 == 0 and ip2 == 0: # vertex
+                    #        wtmp = 0
+                    #    elif ip1 == OrientDS['wtr'].NTheta[kk]-1:
+                    #        wtmp = (ang2-OrientDS['wtr'].THETA_angles[kk][ip1])/(2*np.pi+OrientDS['wtr'].THETA_angles[kk][0]-OrientDS['wtr'].THETA_angles[kk][ip1])
+                    #    else:
+                    #        wtmp = (ang2-OrientDS['wtr'].THETA_angles[kk][ip1])/(OrientDS['wtr'].THETA_angles[kk][ip2]-OrientDS['wtr'].THETA_angles[kk][ip1])
+                    #    orient_pr.append(wtmp)
 
-                    wghx1[i] = orient_pr[0]
-                    wghx2[i] = orient_pr[1]
+                    #wghx1[i] = orient_pr[0]
+                    #wghx2[i] = orient_pr[1]
 
-                    ihs = dtheta_ndx[i].keys()
-                    wghy[i] = (ang1 - OrientDS['wtr'].PHI_angles[ihs[0]])/(OrientDS['wtr'].PHI_angles[ihs[1]]-OrientDS['wtr'].PHI_angles[ihs[0]])
+                    #ihs = dtheta_ndx[i].keys()
+                    #wghy[i] = (ang1 - OrientDS['wtr'].PHI_angles[ihs[0]])/(OrientDS['wtr'].PHI_angles[ihs[1]]-OrientDS['wtr'].PHI_angles[ihs[0]])
 
-                    label[i] = 1
-                    #print "++++++",wghx1[i],wghx2[i],wghy[i]
-                    grids_sub_ndx[i] = self.dgrids_sub_ndx[i][ihs[0]] + self.dgrids_sub_ndx[i][ihs[1]]
+                    #label[i] = 1
+                    ##print "++++++",wghx1[i],wghx2[i],wghy[i]
+                    #grids_sub_ndx[i] = self.dgrids_sub_ndx[i][ihs[0]] + self.dgrids_sub_ndx[i][ihs[1]]
                 if len(dtheta_ndx[i]) == 3:
                     ihs = dtheta_ndx[i].keys()
                     grids_sub_ndx[i] = self.dgrids_sub_ndx[i][ihs[0]] + self.dgrids_sub_ndx[i][ihs[1]] + self.dgrids_sub_ndx[i][ihs[2]]
@@ -715,32 +715,32 @@ class coordinates():
         ## on the level of r, theta, phi
         self.properties = {}
         if len(dtheta_ndx_layer) == 2: # for grids near vertex of each layers, linear interpolation for grids and quadratic interpolation for layers; NOT IN THIS SCRIPT
-            wghx = []
-            for kk in dtheta_ndx_layer:
-                ip1 = dtheta_ndx_layer[kk][0]
-                ip2 = dtheta_ndx_layer[kk][1]
-                if ip1 == 0 and ip2 == 0:
-                    wtmp = 0
-                else:
-                    wtmp = (self.ang2-DS[self.FT].THETA_angles[kk][ip1])/(DS[self.FT].THETA_angles[kk][ip2]-DS[self.FT].THETA_angles[kk][ip1])
-                wghx.append(wtmp)
-            ihs = dtheta_ndx_layer.keys()
-            wghy = (self.ang1-DS[self.FT].PHI_angles[ihs[0]])/(DS[self.FT].PHI_angles[ihs[1]]-DS[self.FT].PHI_angles[ihs[0]])
-            for pp in propnames:
-                psub_r = []
-                for m in range(0,len(properties[pp]),4): # for each layer
-                    #print pp, properties[pp][m], properties[pp][m+1],properties[pp][m+2], properties[pp][m+3], wghx[0], wghx[1], wghy
-                    psub = bilinear_gen(properties[pp][m], properties[pp][m+1],properties[pp][m+2], properties[pp][m+3], wghx[0], wghx[1], wghy,1)
-                    psub_r.append(psub)
-                if not len(psub_r) == 3:
-                    #print 'quadratic interpolation needs 3 layers'
-                    sys.exit()
-                points = []
-                for t in range(len(ri_ndxs)):
-                    dist = DS[self.FT].R_NDX[ri_ndxs[t]]
-                    points.append((dist,psub_r[t]))
-                p = lagrange_interp(points,self.r)
-                self.properties[pp] = p
+            #Wghx = []
+            #For kk in dtheta_ndx_layer:
+            #    ip1 = dtheta_ndx_layer[kk][0]
+            #    ip2 = dtheta_ndx_layer[kk][1]
+            #    if ip1 == 0 and ip2 == 0:
+            #        wtmp = 0
+            #    else:
+            #        wtmp = (self.ang2-DS[self.FT].THETA_angles[kk][ip1])/(DS[self.FT].THETA_angles[kk][ip2]-DS[self.FT].THETA_angles[kk][ip1])
+            #    wghx.append(wtmp)
+            #Ihs = dtheta_ndx_layer.keys()
+            #Wghy = (self.ang1-DS[self.FT].PHI_angles[ihs[0]])/(DS[self.FT].PHI_angles[ihs[1]]-DS[self.FT].PHI_angles[ihs[0]])
+            #For pp in propnames:
+            #    psub_r = []
+            #    for m in range(0,len(properties[pp]),4): # for each layer
+            #        #print pp, properties[pp][m], properties[pp][m+1],properties[pp][m+2], properties[pp][m+3], wghx[0], wghx[1], wghy
+            #        psub = bilinear_gen(properties[pp][m], properties[pp][m+1],properties[pp][m+2], properties[pp][m+3], wghx[0], wghx[1], wghy,1)
+            #        psub_r.append(psub)
+            #    if not len(psub_r) == 3:
+            #        #print 'quadratic interpolation needs 3 layers'
+            #        sys.exit()
+            #    points = []
+            #    for t in range(len(ri_ndxs)):
+            #        dist = DS[self.FT].R_NDX[ri_ndxs[t]]
+            #        points.append((dist,psub_r[t]))
+            #    p = lagrange_interp(points,self.r)
+            #    self.properties[pp] = p
 
         elif len(dtheta_ndx_layer) == 3: # quadratic interpolation for layers and grids
             for pp in propnames:

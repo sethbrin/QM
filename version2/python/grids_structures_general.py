@@ -143,7 +143,7 @@ class data_structure():
             self.NTheta[i] = len(self.THETA_angles[i])
             for j in range(self.NTheta[i]):
                 self.THETA_angles[i][j] *= D2R
-                self.nGrid += self.NTheta[i]
+            self.nGrid += self.NTheta[i]
 
 
 class wtr_structure(data_structure):

@@ -18,6 +18,11 @@
 **/compile
 **/aclocal.m4
 
+**/build
+**/tags
+**/cmake-build-debug/
+**/.idea
+
 # exvim
 **/src.exvim
 **/.exvim.src/
