@@ -49,6 +49,11 @@ InpAtom::InpAtom(std::string line)
 
 }
 
+InpAtom::InpAtom(const std::vector<double>& points, std::string name) {
+    m_name = name;
+    m_x = points;
+}
+
 Atom* InpAtom::copy()
 {
     Atom* newAtom = new InpAtom(*this);
@@ -99,6 +104,14 @@ void Coordinates::addAtom(std::string& line, const std::string& ftype)
         m_atoms.push_back(boost::shared_ptr<Atom>(new InpAtom(line)));
     }
 }
+
+void Coordinates::addAtom(std::vector<double>& points, std::string name, const std::string& ftype) {
+    if (ftype == "gms")
+    {
+        m_atoms.push_back(boost::shared_ptr<Atom>(new InpAtom(points, name)));
+    }
+}
+
 
 void Coordinates::ReorientToOrigin(double cut=0.0000001)
 {
@@ -926,4 +939,37 @@ std::string QMInterpolation::process(std::string filename)
     sprintf(res, "%s %12.7f %12.7f %12.7f", filename.c_str(), interp.get_interp_force()[0], interp.get_interp_force()[1], interp.get_interp_force()[2]);
 
     return std::string(res);
+}
+
+void QMInterpolation::calculate(const std::map<std::string, std::vector<double>>& lhs,
+        const std::map<std::string, std::vector<double>>& rhs) {
+    std::string name;
+    Coordinates interp = Coordinates(3,3, m_fftype, name);
+
+    for (auto item : lhs)
+    {
+        interp.addAtom(item.second, item.first, "gms");
+    }
+
+    for (auto item : rhs)
+    {
+        interp.addAtom(item.second, item.first, "gms");
+    }
+
+    interp.ReorientToOrigin();
+    interp.MirrorAll();
+    try
+    {
+        interp.indexing_auto3();
+    } catch (std::invalid_argument &e)
+    {
+        fprintf(stderr, "indexing_auto3 execption\n");
+    }
+
+    interp.calt_conf_energy(m_allconfig);
+
+    m_energy = interp.get_interp_energy();
+    interp.reverse_force_toque();
+    m_force = interp.get_interp_force();
+    m_torque = interp.get_interp_torque();
 }

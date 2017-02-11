@@ -62,6 +62,7 @@ namespace QM
   {
   public:
     explicit InpAtom(std::string line);
+    InpAtom(const std::vector<double>& points, std::string name);
 
     ~InpAtom(){}
     Atom* copy();
@@ -75,6 +76,8 @@ namespace QM
     explicit Coordinates(int n1, int n2, std::string& fragtype, std::string& name);
 
     void addAtom(std::string& line, const std::string& ftype);
+
+    void addAtom(std::vector<double>& points, std::string name, const std::string& ftype);
 
     void ReorientToOrigin(double cut);
 
@@ -191,12 +194,19 @@ namespace QM
 
     std::string process(std::string filename);
 
+    void calculate(const std::map<std::string, std::vector<double>>& lhs,
+            const std::map<std::string, std::vector<double>>& rhs);
+
+    std::vector<double> m_force;
+    std::vector<double> m_torque;
+    double m_energy;
   private:
     std::string m_fftype;
     database::EnergeForceDatabase& m_allconfig;
 
     const static std::vector<int> m_aa_ndx;
     const static std::vector<int> m_prob_ndx;
+
   };
 }
 #endif
