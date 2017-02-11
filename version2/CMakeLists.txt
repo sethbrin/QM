@@ -28,7 +28,9 @@ set(SOURCE_FILES
 
 link_directories(${PROJECT_SOURCE_DIR}/gzstream)
 
-add_library(waterbox ${LIB_SOURCE_FILES})
+add_library(waterbox_static ${LIB_SOURCE_FILES})
+add_library(waterbox SHARED ${LIB_SOURCE_FILES})
+
 add_executable(version2 ${SOURCE_FILES})
 target_link_libraries(version2
     z gzstream.a boost_filesystem boost_system boost_thread)
