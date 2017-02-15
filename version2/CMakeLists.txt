@@ -33,5 +33,5 @@ add_library(waterbox SHARED ${LIB_SOURCE_FILES})
 
 add_executable(version2 ${SOURCE_FILES})
 target_link_libraries(version2
-    z gzstream.a boost_filesystem boost_system boost_thread)
+    gzstream.a boost_filesystem boost_system boost_thread z)
 
