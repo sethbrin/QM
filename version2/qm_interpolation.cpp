@@ -769,6 +769,7 @@ void Coordinates::calt_conf_energy(database::EnergeForceDatabase& allconfig, boo
                             if (ip >= m_orient_DS[i]->m_NTheta[kk]) {
                                 angTheta = 2 * M_PI + m_orient_DS[i]->m_THETA_angles[kk][ip-m_orient_DS[i]->m_NTheta[kk]];
                             } else if (ip < 0) {
+                                ip = m_orient_DS[i]->m_NTheta[kk] + ip;
                                 angTheta = m_orient_DS[i]->m_THETA_angles[kk][ip] - 2 * M_PI;
                             } else {
                                 angTheta = m_orient_DS[i]->m_THETA_angles[kk][ip];
