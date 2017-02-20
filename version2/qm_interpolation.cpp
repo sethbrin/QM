@@ -872,7 +872,7 @@ QMInterpolation::QMInterpolation(std::string fftype, database::EnergeForceDataba
 {};
 
 // return the output string, then write to file
-std::string QMInterpolation::process(std::string filename)
+std::vector<std::string> QMInterpolation::process(std::string filename)
 {
     std::ifstream ifs(filename);
 
@@ -947,11 +947,16 @@ std::string QMInterpolation::process(std::string filename)
     interp.reverse_force_toque();
 
 
+    std::vector<std::string> result;
     char res[100];
-    //sprintf(res, "%s %12.7f %.3f", filename.c_str(), e_interp, dist);
+    sprintf(res, "%s %12.7f %.3f", filename.c_str(), e_interp, dist);
+    result.push_back(res);
     sprintf(res, "%s %12.7f %12.7f %12.7f", filename.c_str(), interp.get_interp_force()[0], interp.get_interp_force()[1], interp.get_interp_force()[2]);
+    result.push_back(res);
+    sprintf(res, "%s %12.7f %12.7f %12.7f", filename.c_str(), interp.get_interp_torque()[0], interp.get_interp_torque()[1], interp.get_interp_torque()[2]);
+    result.push_back(res);
 
-    return std::string(res);
+    return result;
 }
 
 void QMInterpolation::calculate(const std::map<std::string, std::vector<double>>& lhs,

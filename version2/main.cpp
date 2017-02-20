@@ -27,7 +27,9 @@ static void usage()
   cerr << "Options:" << endl;
   cerr << "  -d, --database  the database file(gz file)" << endl;
   cerr << "  -i, --input     input dir which contains .inp files" << endl;
-  cerr << "  -o, --ouput     output file" << endl;
+  cerr << "  -e, --ouput_energy     output file" << endl;
+  cerr << "  -f, --ouput_force     output file" << endl;
+  cerr << "  -t, --ouput_torque     output file" << endl;
   cerr << "  -m, --model     current only support \"wtr\"" << endl;
 #ifdef USE_THREADS
   cerr << "  -t, --threads   threads count" << endl;
@@ -77,7 +79,9 @@ int main(int argc, char* argv[])
 
   string database_file;
   string input_dir;
-  string output_file;
+  string output_energy_file;
+  string output_force_file;
+  string output_torque_file;
   string model;
 
 #ifdef USE_THREADS
@@ -90,6 +94,9 @@ int main(int argc, char* argv[])
     {"help", no_argument, NULL, 'h'},
     {"database", required_argument, NULL, 'd'},
     {"input", required_argument, NULL, 'i'},
+    {"ouput_energy", required_argument, NULL, 'e'},
+    {"ouput_force", required_argument, NULL, 'f'},
+    {"ouput_torque", required_argument, NULL, 't'},
     {"ouput", required_argument, NULL, 'o'},
     {"model", required_argument, NULL, 'm'},
 #ifdef USE_THREADS
@@ -99,9 +106,9 @@ int main(int argc, char* argv[])
   };
 
 #ifdef USE_THREADS
-  while ((c = getopt_long(argc, argv, "h?d:i:o:m:t:?", loptions, NULL)) != -1)
+  while ((c = getopt_long(argc, argv, "h?d:i:e:f:t:m:t:?", loptions, NULL)) != -1)
 #else
-  while ((c = getopt_long(argc, argv, "h?d:i:o:m:", loptions, NULL)) != -1)
+  while ((c = getopt_long(argc, argv, "h?d:i:e:f:t:m:", loptions, NULL)) != -1)
 #endif
   {
     switch(c)
@@ -112,8 +119,14 @@ int main(int argc, char* argv[])
     case 'i':
       input_dir = optarg;
       break;
-    case 'o':
-      output_file = optarg;
+    case 'e':
+      output_energy_file = optarg;
+      break;
+    case 'f':
+      output_force_file = optarg;
+      break;
+    case 't':
+      output_torque_file = optarg;
       break;
     case 'm':
       model = optarg;
@@ -146,7 +159,9 @@ int main(int argc, char* argv[])
   boost::filesystem::path path(input_dir);
   boost::filesystem::directory_iterator end_iter;
 
-  FILE* fp_out = fopen(output_file.c_str(), "w");
+  FILE* fp_energy_out = fopen(output_energy_file.c_str(), "w");
+  FILE* fp_force_out = fopen(output_force_file.c_str(), "w");
+  FILE* fp_torque_out = fopen(output_torque_file.c_str(), "w");
   for (boost::filesystem::directory_iterator iter(path);
           iter!=end_iter; ++iter)
   {
@@ -156,8 +171,13 @@ int main(int argc, char* argv[])
 #ifdef USE_THREADS
        filenames.push(iter->path().string());
 #else
-       fprintf(fp_out, "%s\n",
-               interpolation.process(iter->path().string()).c_str());
+       auto res = interpolation.process(iter->path().string());
+       fprintf(fp_energy_out, "%s\n",
+               res[0].c_str());
+       fprintf(fp_force_out, "%s\n",
+               res[1].c_str());
+       fprintf(fp_torque_out, "%s\n",
+               res[2].c_str());
 #endif
     }
   }
@@ -177,6 +197,8 @@ int main(int argc, char* argv[])
   threads.join_all();
 #endif
 
-  fclose(fp_out);
+  fclose(fp_energy_out);
+  fclose(fp_force_out);
+  fclose(fp_torque_out);
   return 0;
 }

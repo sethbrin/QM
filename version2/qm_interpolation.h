@@ -192,7 +192,7 @@ namespace QM
   public:
     explicit QMInterpolation(std::string fftype, database::EnergeForceDatabase& allconfig);
 
-    std::string process(std::string filename);
+    std::vector<std::string> process(std::string filename);
 
     void calculate(const std::map<std::string, std::vector<double>>& lhs,
             const std::map<std::string, std::vector<double>>& rhs);
