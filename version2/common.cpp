@@ -326,11 +326,11 @@ vector<int> weights_in_subsection(const vector<double>& bisvec, double& wghx, do
   // angx is calculated by arctan(dy/dx)
   double tempx = bisvec[ax[quad_ndx][subndx][0]];
   double tempy = bisvec[ax[quad_ndx][subndx][1]];
-  double angx = std::atan(fabs(tempy / tempx));
+  double angx = std::atan(std::fabs(tempy / tempx));
 
   // angy is calculated by arctan(dy/dx):
   double tempz = bisvec[ax[quad_ndx][subndx][2]];
-  double angy = std::asin(fabs(tempz));
+  double angy = std::asin(std::fabs(tempz));
   // Bilinear:
   //
   //  y3<----y2
@@ -455,7 +455,7 @@ pair<double, array<int, 3>> get_neighors_for_normal(const vector<double>& normal
             ndx2 = ndx1 + 1;
             double tmp1 = (ndx2 + 1) * da - ang0;
             double tmp2 = ang0 - (ndx1 - 1) * da;
-            if (abs(tmp1) < abs(tmp2)) {
+            if (std::abs(tmp1) < std::abs(tmp2)) {
                 if (ndx2 == nvec-1) {
                     ndx3 = nvec;
                 } else {

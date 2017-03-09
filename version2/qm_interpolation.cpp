@@ -148,7 +148,7 @@ void Coordinates::ReorientToOrigin(double cut=0.0000001)
         m_pDS->calt_vec2(m_atoms[0]->m_x, m_atoms[1]->m_x, m_atoms[2]->m_x);
 
     ang = angle(tmp_pair.first, tmp_pair.second);
-    if (fabs(ang) < cut)
+    if (std::fabs(ang) < cut)
     {
         return;
     }
@@ -204,7 +204,7 @@ void Coordinates::spherical_x()
 
     double ang1 = M_PI * 0.5 - ::acos(x[2] / r);
     double ang2;
-    if (fabs(x[0]) < 0.000001)
+    if (std::fabs(x[0]) < 0.000001)
     {
         if (x[1] > 0)
         {
