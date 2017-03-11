@@ -136,9 +136,28 @@ namespace QM
     std::vector<int> m_operateNdx;
     std::vector<std::pair<std::vector<double>, double>> m_operations;
 
+    std::vector<double> m_center_coord_normalized;
+    bool m_exit_before = false;
+
   private:
     void spherical_x();
     void spherical_orient();
+
+    std::vector<double> get_com(const std::vector<boost::shared_ptr<Atom>>& atoms) {
+        double totalM = 0;
+        std::vector<double> x = {0, 0, 0};
+        for (int i = 0; i < atoms.size(); i++) {
+            for (int k = 0; k < 3; k++) {
+                x[k] += atoms[i]->m_x[k] * TMASS[i];
+            }
+            totalM += TMASS[i];
+        }
+        for (int k = 0; k < 3; k++) {
+            x[k] /= totalM;
+        }
+        return x;
+    }
+
 
     std::vector<double> norm_prob(const std::vector<database::Atom>& config,
             std::vector<int> ndx, std::string prob="wtr") {
@@ -189,23 +208,23 @@ namespace QM
 
   class QMInterpolation
   {
-  public:
-    explicit QMInterpolation(std::string fftype, database::EnergeForceDatabase& allconfig);
+      public:
+          explicit QMInterpolation(std::string fftype, database::EnergeForceDatabase& allconfig);
 
-    std::vector<std::string> process(std::string filename);
+          std::vector<std::string> process(std::string filename);
 
-    void calculate(const std::map<std::string, std::vector<double>>& lhs,
-            const std::map<std::string, std::vector<double>>& rhs);
+          void calculate(const std::map<std::string, std::vector<double>>& lhs,
+                  const std::map<std::string, std::vector<double>>& rhs);
 
-    std::vector<double> m_force;
-    std::vector<double> m_torque;
-    double m_energy;
-  private:
-    std::string m_fftype;
-    database::EnergeForceDatabase& m_allconfig;
+          std::vector<double> m_force;
+          std::vector<double> m_torque;
+          double m_energy;
+      private:
+          std::string m_fftype;
+          database::EnergeForceDatabase& m_allconfig;
 
-    const static std::vector<int> m_aa_ndx;
-    const static std::vector<int> m_prob_ndx;
+          const static std::vector<int> m_aa_ndx;
+          const static std::vector<int> m_prob_ndx;
 
   };
 }

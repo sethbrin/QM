@@ -55,7 +55,7 @@ class QM_test_interpolation():
         E2 = allconfig.mole2.E
 
         ## filenames to be tested:
-        temp = os.popen('ls random/test????.inp')
+        temp = os.popen('ls random3/???.pdb.inp')
         fnames = []
         while 1:
             line = temp.readline()

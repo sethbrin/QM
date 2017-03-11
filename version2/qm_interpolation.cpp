@@ -116,6 +116,13 @@ void Coordinates::addAtom(std::vector<double>& points, std::string name, const s
 void Coordinates::ReorientToOrigin(double cut=0.0000001)
 {
     int cnt_of_atoms = m_atoms.size();
+    auto coord1 = get_com({m_atoms[0], m_atoms[1], m_atoms[2]});
+    auto coord2 = get_com({m_atoms[3], m_atoms[4], m_atoms[5]});
+    for (int i = 0; i < 3; i++) {
+       m_center_coord_normalized.push_back(coord2[i] - coord1[i]);
+    }
+    get_unit(m_center_coord_normalized);
+    
     std::vector<double> dvec = m_pDS->calt_dvec(m_atoms[0]->m_x, m_atoms[1]->m_x, m_atoms[2]->m_x);
 
     for (int i=0; i<cnt_of_atoms; i++)
@@ -619,7 +626,9 @@ void Coordinates::calt_conf_energy(database::EnergeForceDatabase& allconfig, boo
         }
         if (ri < 0.0)
         {
-            m_properties = {{"E", ehigh}};
+            m_properties = {{"E", ehigh}, {"Fx", ehigh * m_center_coord_normalized[0]}, {"Fy", ehigh * m_center_coord_normalized[1]},
+              {"Fz", ehigh * m_center_coord_normalized[2]}, {"Tx", 0}, {"Ty", 0}, {"Tz", 0}};
+            m_exit_before = true;
             return;
         }
     }
@@ -847,6 +856,7 @@ void Coordinates::reverse_force_toque() {
     m_force = {m_properties["Fx"],
         m_properties["Fy"], m_properties["Fz"]};
     m_torque = {m_properties["Tx"], m_properties["Ty"], m_properties["Tz"]};
+    if (m_exit_before) return;
 
     MirrorBackProperty();
     ReorientToOldVec();

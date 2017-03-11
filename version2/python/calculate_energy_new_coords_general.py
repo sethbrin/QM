@@ -1,7 +1,6 @@
 import os,sys
 from trans_rot_coords import *
 import numpy as np
-from likely import Grid3DInterpolator
 from read_energy_force_new import *
 from grids_structures_general import DS,Grid_Quarts
 from orient_struct_2 import OrientDS as OrientDS_2
@@ -13,6 +12,15 @@ R2D = 180.0/3.14159265358979
 ## np.pi/4.0:
 pi4 = 0.78539816339744817
 tMass = [15.999, 1.008, 1.008]
+
+def get_com(coords):
+   x = [0,0,0]
+   totalM = 0
+   for i in range(len(coords)):
+       x = [ x[k]+ coords[i][k]*tMass[i] for k in range(3)]
+       totalM += tMass[i]
+   x = [x[k]/totalM for k in range(3)]
+   return x
 
 def norm_prob(config,ndx,prob='wtr'):
     if prob=='wtr':
@@ -125,6 +133,12 @@ class coordinates():
 
     def ReorientToOrigin(self, cut=0.0000001):
         self.atoms = deepcopy(self.original_atoms)
+        import pdb
+        pdb.set_trace()
+        coord1 = get_com([self.atoms[0].x, self.atoms[1].x, self.atoms[2].x ])
+        coord2 = get_com([self.atoms[3].x, self.atoms[4].x, self.atoms[5].x ])
+        self.origin_center_coord = get_unit([coord2[i] - coord1[i] for i in range(3)])
+
         dvec = DS[self.FT].calt_dvec( self.atoms[0].x, self.atoms[1].x, self.atoms[2].x )
 
         for i in range(self.natoms):
@@ -535,12 +549,16 @@ class coordinates():
 
     def calt_conf_energy(self, allconfigs, IsForce=False, ehigh=100.0):
         ri_ndxs = self.r_ndxs
+        self.exit_before = False
         for ri in ri_ndxs:
             if ri>100:
                 self.properties = {'E':0.0}
                 return
             elif ri<0:
-                self.properties = {'E':ehigh}
+                fuck = [self.origin_center_coord[i] * ehigh for i in range(3)]
+                self.properties = {'E':ehigh, "Fx": fuck[0], "Fy": fuck[1], "Fz": fuck[2],
+                                    "Tx": 0, "Ty": 0, "Tz": 0}
+                self.exit_before = True
                 return
 
         bisv = self.vbis
@@ -597,6 +615,7 @@ class coordinates():
                 self.indexing_orient_auto3(i)
                 dtheta_ndx[i] = self.dtheta_ndx[i]
                 if len(dtheta_ndx[i]) == 2: # not in this script
+                    pass
                     #orient_pr =[]
                     #for kk in dtheta_ndx[i]:
                     #    ip1=dtheta_ndx[i][kk][0]
@@ -715,6 +734,7 @@ class coordinates():
         ## on the level of r, theta, phi
         self.properties = {}
         if len(dtheta_ndx_layer) == 2: # for grids near vertex of each layers, linear interpolation for grids and quadratic interpolation for layers; NOT IN THIS SCRIPT
+            pass
             #Wghx = []
             #For kk in dtheta_ndx_layer:
             #    ip1 = dtheta_ndx_layer[kk][0]
@@ -789,6 +809,8 @@ class coordinates():
         Ty = self.properties['Ty']
         Tz = self.properties['Tz']
         self.torque = [Tx, Ty, Tz]
+        if self.exit_before:
+           return
 
         self.MirrorBackProperty()
         self.ReorientToOldVec()
