@@ -213,8 +213,8 @@ namespace QM
 
           std::vector<std::string> process(std::string filename);
 
-          void calculate(const std::map<std::string, std::vector<double>>& lhs,
-                  const std::map<std::string, std::vector<double>>& rhs);
+          void calculate(const std::vector<std::vector<double>>& lhs,
+                         const std::vector<std::vector<double>>& rhs);
 
           std::vector<double> m_force;
           std::vector<double> m_torque;

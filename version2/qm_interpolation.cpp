@@ -122,7 +122,7 @@ void Coordinates::ReorientToOrigin(double cut=0.0000001)
        m_center_coord_normalized.push_back(coord2[i] - coord1[i]);
     }
     get_unit(m_center_coord_normalized);
-    
+
     std::vector<double> dvec = m_pDS->calt_dvec(m_atoms[0]->m_x, m_atoms[1]->m_x, m_atoms[2]->m_x);
 
     for (int i=0; i<cnt_of_atoms; i++)
@@ -969,19 +969,16 @@ std::vector<std::string> QMInterpolation::process(std::string filename)
     return result;
 }
 
-void QMInterpolation::calculate(const std::map<std::string, std::vector<double>>& lhs,
-        const std::map<std::string, std::vector<double>>& rhs) {
+void QMInterpolation::calculate(const std::vector<std::vector<double>>& lhs,
+                                const std::vector<std::vector<double>>& rhs) {
     std::string name;
     Coordinates interp = Coordinates(3,3, m_fftype, name);
 
-    for (auto item : lhs)
-    {
-        interp.addAtom(item.second, item.first, "gms");
+    for (auto item : lhs) {
+      interp.addAtom(item, "", "gms");
     }
-
-    for (auto item : rhs)
-    {
-        interp.addAtom(item.second, item.first, "gms");
+    for (auto item : rhs) {
+      interp.addAtom(item, "", "gms");
     }
 
     interp.ReorientToOrigin();
