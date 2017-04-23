@@ -65,6 +65,7 @@ class Grid {
   }
 
   ~Grid() {
+    // FIXME memory leak
     //free_node(m_head_node);
   }
 
