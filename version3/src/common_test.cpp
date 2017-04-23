@@ -40,7 +40,6 @@ void test_linspace() {
 }
 
 void test_vecop() {
-  using namespace common;
   vector<double> expect = { 1.3,  1.9,  2.5};
   vector<double> a = {0.3, 0.9, 1.5};
   vector<double> b = {1.0, 1.0, 1.0};
@@ -48,9 +47,19 @@ void test_vecop() {
   assert_equal(a + b, expect);
 }
 
+void test_tokenizer() {
+  using namespace common;
+  string s = "12  32  4354";
+  vector<string> tokens = tokenizer(s, ' ');
+  vector<string> expect = {"12", "32", "4354"};
+
+  assert_equal(tokens, expect);
+}
+
 int main() {
   test_linspace();
   test_vecop();
+  test_tokenizer();
 
   printf("Test passed!!!\n");
   return 0;

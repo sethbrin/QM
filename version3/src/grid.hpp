@@ -8,6 +8,8 @@
 #include <cmath>
 #include <cstdio>
 #include <vector>
+#include <fstream>
+#include <iostream>
 
 #include "common.h"
 
@@ -43,6 +45,7 @@ struct Node {
       return res;
     }
   }
+
 };
 
 class Grid {
@@ -59,6 +62,10 @@ class Grid {
 
     m_ang_params = {0.20, 0.45, 3.8, 0.4};
     m_ori_params = {0.23, 0.45, 3.8, 0.4};
+  }
+
+  ~Grid() {
+    //free_node(m_head_node);
   }
 
   // Setup the grid structure without assigning the y values
@@ -102,18 +109,92 @@ class Grid {
     m_n = node_r->count();
   }
 
+  void load(const char* filename) {
+    printf("Loading y values for each grid from file\n");
+
+    std::ifstream ifs(filename);
+    if (!ifs.good()) {
+      std::cerr << "ERROR: Opening file '" << filename << "' failed.\n";
+      exit(EXIT_FAILURE);
+    }
+
+    std::string line;
+    if (!ifs.eof()) {
+      //! Read first 3 lines
+      //! First is ANGPRM
+      //! Second is ORIPRM
+      //! Third is RS
+      std::getline(ifs, line);
+      auto fields = common::split(line, '\t');
+      assert(fields[0] == "ANGPRM" && fields.size() == 5);
+      for (size_t idx = 1; idx < fields.size(); ++idx) {
+        m_ang_params[idx-1] = std::stof(fields[idx]);
+      }
+
+      std::getline(ifs, line);
+      fields = common::split(line, '\t');
+      assert(fields[0] == "ORIPRM" && fields.size() == 5);
+      for (size_t idx = 1; idx < fields.size(); ++idx) {
+        m_ori_params[idx-1] = std::stof(fields[idx]);
+      }
+
+      std::getline(ifs, line);
+      fields = common::split(line, '\t');
+      assert(fields[0] == "RS");
+      m_rs.clear();
+      for (size_t idx = 1; idx < fields.size(); ++idx) {
+        m_rs.push_back(std::stof(fields[idx]));
+      }
+
+      setup();
+
+      gen_leaves_with_x(m_head_node, {}, ifs);
+    }
+  }
+
   vector<double> interpolate(const vector<double>& coor, int order = 2) {
     return interpolate_help(coor, m_head_node, order);
   }
 
-  int get_n() const {
-    return m_n;
-  }
+  int get_n() const { return m_n; }
 
  private:
+  void free_node(Node* head) {
+    if (head == nullptr) return;
+    for (Node* node : head->next) {
+      free_node(node);
+    }
+    delete head;
+  }
+
+  void gen_leaves_with_x(Node* head, const vector<double>& x,
+                          std::ifstream& ifs) {
+    if (head->next.empty()) {
+      std::string line;
+      std::getline(ifs, line);
+      if (line == "") {
+        return;
+      }
+      auto fields = common::split(line, '\t');
+      assert(fields.size() == 7);
+      for (auto&& field : fields) {
+        head->y.push_back(std::stof(field));
+      }
+    }
+    int idx = 0;
+    for (Node* node : head->next) {
+      auto y = x;
+      y.insert(y.end(), head->xs[idx]);
+      gen_leaves_with_x(node, y, ifs);
+      idx += 1;
+    }
+  }
+
   vector<double> interpolate_help(const vector<double>& coor, Node* node,
                                   int order = 2) {
-    if (node->next.empty()) return node->y;
+    if (node->next.empty()) {
+      return node->y;
+    }
 
     double my_x = coor[0];
     vector<double> coor_tmp(std::next(coor.begin()), coor.end());
@@ -307,9 +388,9 @@ class Grid {
    */
   double get_dl(double r, const array<double, 4>& params) {
     return (params[1] - params[0]) /
-           (1 + std::exp((params[2] - r) / params[3])) + params[0];
+               (1 + std::exp((params[2] - r) / params[3])) +
+           params[0];
   }
-
 
   Node* m_head_node = nullptr;
   int m_n = 0;
