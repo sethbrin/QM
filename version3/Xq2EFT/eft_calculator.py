@@ -36,6 +36,8 @@ class EFT_calculator:
 
     # Evaluate the Xcom and q for a pair of mols by querying the grid
     def eval(self, coors0, coors1):
+        import pdb
+        pdb.set_trace()
         Xcom0 = self.mol.getCOM(coors0)
         Xcom1 = self.mol.getCOM(coors1)
         R0 = self.mol.getR(coors0)
@@ -69,8 +71,6 @@ class EFT_calculator:
         ophi1, ophi2, otheta = tools.q2spherical(q)
         coor = [r, phi, theta, ophi1, ophi2, otheta]
         # use the grid to obtain results
-        import pdb
-        pdb.set_trace()
         eft = self.grid.interpolate(coor, self.order)
         ener = eft[0]
         force = eft[1:4]

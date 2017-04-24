@@ -129,14 +129,14 @@ class Grid {
       auto fields = common::split(line, '\t');
       assert(fields[0] == "ANGPRM" && fields.size() == 5);
       for (size_t idx = 1; idx < fields.size(); ++idx) {
-        m_ang_params[idx-1] = std::stof(fields[idx]);
+        m_ang_params[idx-1] = std::stod(fields[idx]);
       }
 
       std::getline(ifs, line);
       fields = common::split(line, '\t');
       assert(fields[0] == "ORIPRM" && fields.size() == 5);
       for (size_t idx = 1; idx < fields.size(); ++idx) {
-        m_ori_params[idx-1] = std::stof(fields[idx]);
+        m_ori_params[idx-1] = std::stod(fields[idx]);
       }
 
       std::getline(ifs, line);
@@ -144,7 +144,7 @@ class Grid {
       assert(fields[0] == "RS");
       m_rs.clear();
       for (size_t idx = 1; idx < fields.size(); ++idx) {
-        m_rs.push_back(std::stof(fields[idx]));
+        m_rs.push_back(std::stod(fields[idx]));
       }
 
       setup();
@@ -179,7 +179,7 @@ class Grid {
       auto fields = common::split(line, '\t');
       assert(fields.size() == 7);
       for (auto&& field : fields) {
-        head->y.push_back(std::stof(field));
+        head->y.push_back(std::stod(field));
       }
     }
     int idx = 0;

@@ -211,7 +211,7 @@ class QMInterpolation {
       auto fields = common::tokenizer(lines[idx], ' ');
       assert(fields.size() == 5);
       coors.push_back(
-          {std::stof(fields[2]), std::stof(fields[3]), std::stof(fields[4])});
+          {std::stod(fields[2]), std::stod(fields[3]), std::stod(fields[4])});
     }
     ifs.close();
 
