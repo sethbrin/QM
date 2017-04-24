@@ -36,8 +36,6 @@ class EFT_calculator:
 
     # Evaluate the Xcom and q for a pair of mols by querying the grid
     def eval(self, coors0, coors1):
-        import pdb
-        pdb.set_trace()
         Xcom0 = self.mol.getCOM(coors0)
         Xcom1 = self.mol.getCOM(coors1)
         R0 = self.mol.getR(coors0)
